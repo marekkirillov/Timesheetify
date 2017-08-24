@@ -1,6 +1,7 @@
 ﻿namespace TogglToTimesheet
 {
    using System;
+   using System.Collections.Generic;
    using System.DirectoryServices.AccountManagement;
    using System.Globalization;
    using System.Linq;
@@ -134,12 +135,13 @@
          projectContext.ExecuteQuery();
       }
 
-      private static IQueryable<PublishedProject> GetPublishedProjects(User user, ProjectContext projectContext)
+      private static IList<PublishedProject> GetPublishedProjects(User user, ProjectContext projectContext)
       {
          var myProjects =
             projectContext.Projects.Where(
                p => p.ProjectResources.Any(pr => pr.Name.Equals(user.DisplayName)));
-         return myProjects;
+
+         return myProjects.ToList();
       }
 
       private static void AddAdministrativeTasks(TogglProjectsAndTags result, User user)
