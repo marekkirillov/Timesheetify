@@ -1,0 +1,119 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+body {
+    background-image: url(doodles.png)
+}
+
+.body-content footer {
+    text-align: center;
+}
+
+.main-form {
+    background-color: white;
+    border: 1px solid #b0b0b0;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+input.form-control {
+    color: black;
+}
+
+/*.form-group {
+    margin-right: -15px;
+    width: 85%;
+    margin-left: -15px;
+    text-align: center;
+}*/
+
+.status {
+    font-size: 70px;
+    text-align: center;
+}
+
+    .status #small {
+        font-size: 20px;
+    }
+
+h1#heading {
+    margin-bottom: 50px;
+    font-weight: bold
+}
+
+hr {
+    margin-bottom: 50px
+}
+
+.form-group label a {
+    color: #2a6496
+}
+
+#demo {
+    margin-top: 35px;
+}
+
+.modal .modal-dialog {
+    margin-top: 10% !important;
+}
+
+.modal {
+    overflow-y: hidden;
+}
+
+body.modal-open, .modal-open .navbar-fixed-top, .modal-open .navbar-fixed-bottom {
+    margin-right: 0 !important;
+}
+
+
+.preloader5 {
+    display:inline-block;
+    font-size:0px;
+    padding:0px;
+}
+    .preloader5 span {
+        vertical-align: middle;
+        border-radius: 100%;
+        background: #333333;
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        margin: 3px 2px;
+        -webkit-animation: preloader5 0.8s linear infinite alternate;
+        animation: preloader5 0.8s linear infinite alternate;
+    }
+.preloader5 span:nth-child(1) {
+    -webkit-animation-delay:-0.8;
+    animation-delay:-0.8s;
+}
+.preloader5 span:nth-child(2) {
+    -webkit-animation-delay:-0.53333s;
+    animation-delay:-0.53333s;
+}
+.preloader5 span:nth-child(3) {
+    -webkit-animation-delay:-0.26666s;
+    animation-delay:-0.26666s;
+}
+
+@keyframes preloader5 {
+    from {transform: scale(0, 0);}
+    to {transform: scale(1, 1);}
+}
+@-webkit-keyframes preloader5 {
+    from {-webkit-transform: scale(0, 0);}
+    to {-webkit-transform: scale(1, 1);}
+}
+
+.modal-footer{
+    margin-top:0;
+}

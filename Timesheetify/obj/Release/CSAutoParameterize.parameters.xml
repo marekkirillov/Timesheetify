@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="TimesheetifyEntities-Web.config Connection String" description="TimesheetifyEntities Connection String used in web.config by the application to access the database." defaultValue="metadata=res://*/Data.Worker.csdl|res://*/Data.Worker.ssdl|res://*/Data.Worker.msl;provider=System.Data.SqlClient;provider connection string=&quot;data source=tlldev2;initial catalog=Timesheetify;User Id=timesheetify;Password=Ajatabel2017;MultipleActiveResultSets=True;App=EntityFramework&quot;" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Projects\\TogglToTimesheet\\Timesheetify\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='TimesheetifyEntities']/@connectionString" />
+  </parameter>
+</parameters>
