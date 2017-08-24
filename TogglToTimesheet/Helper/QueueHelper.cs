@@ -12,6 +12,9 @@ namespace TogglToTimesheet.Helper
     {
         public static void Wait(Guid jobId, User user)
         {
+           Thread.Sleep(500);
+           return;
+
             using (var wssQueueSystem = GetQueueSystemSvc(user))
             {
                 var attemptsCount = 0;

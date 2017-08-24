@@ -64,7 +64,6 @@
 
             var jobUid = Guid.NewGuid();
             timeSheetSvc.QueueUpdateTimesheet(jobUid, timesheetId, timesheet);
-            QueueHelper.Wait(jobUid, user);
         }
 
         private static TimesheetDataSet.LinesRow GetNewLine(Guid timesheetId, string taskname, TimesheetDataSet timesheet)
