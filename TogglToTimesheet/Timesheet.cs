@@ -7,6 +7,7 @@
    using System.Net;
    using System.ServiceModel.Web;
    using System.Text;
+   using System.Threading;
    using Common;
    using DTO;
    using Microsoft.ProjectServer.Client;
@@ -40,7 +41,7 @@
             {
                if (projectGroup == null)
                   throw new ArgumentNullException("projectGroup");
-               
+
                if (projectGroup.Key == Constants.AdministrativeWork)
                {
                   foreach (var entry in projectGroup)
@@ -89,14 +90,9 @@
             if (!user.UseDefaultCredentials)
                projectContext.Credentials = new NetworkCredential(user.AccountName, user.Password);
 
-            projectContext.Load(projectContext.Projects, projects => projects.Where(p => p.StartDate > startDate)
-                .IncludeWithDefaultProperties(p => p.ProjectResources, pr => pr.Name));
+            LoadProjects(projectContext, startDate);
 
-            projectContext.ExecuteQuery();
-
-            var myProjects =
-                projectContext.Projects.Where(
-                    p => p.ProjectResources.Any(pr => pr.Name.Equals(user.DisplayName)));
+            var myProjects = GetPublishedProjects(user, projectContext);
 
             foreach (var project in myProjects)
             {
@@ -128,6 +124,22 @@
          }
 
          return result;
+      }
+
+      private static void LoadProjects(ProjectContext projectContext, DateTime startDate)
+      {
+         projectContext.Load(projectContext.Projects, projects => projects.Where(p => p.StartDate > startDate)
+            .IncludeWithDefaultProperties(p => p.ProjectResources, pr => pr.Name));
+
+         projectContext.ExecuteQuery();
+      }
+
+      private static IQueryable<PublishedProject> GetPublishedProjects(User user, ProjectContext projectContext)
+      {
+         var myProjects =
+            projectContext.Projects.Where(
+               p => p.ProjectResources.Any(pr => pr.Name.Equals(user.DisplayName)));
+         return myProjects;
       }
 
       private static void AddAdministrativeTasks(TogglProjectsAndTags result, User user)
@@ -248,15 +260,25 @@
       {
          var taskName = entry.TaskHierarchy.Last();
          var timesheetLine = FindTimesheetLine(weeklyTimesheet, taskName, Constants.AdministrativeWork);
+         var retryCount = 10;
 
          if (timesheetLine == null)
          {
             TimeSheetExtended.AddAdministrativeLine(weeklyTimesheet.TimeSheet.Id, taskName, entry.Comment, user);
 
-            projectContext.Load(weeklyTimesheet.TimeSheet.Lines);
-            projectContext.ExecuteQuery();
+            while (timesheetLine == null)
+            {
+               Thread.Sleep(500);
 
-            timesheetLine = FindTimesheetLine(weeklyTimesheet, taskName, Constants.AdministrativeWork);
+               retryCount -= 1;
+
+               projectContext.Load(weeklyTimesheet.TimeSheet.Lines);
+               projectContext.ExecuteQuery();
+               timesheetLine = FindTimesheetLine(weeklyTimesheet, taskName, Constants.AdministrativeWork);
+
+               if (retryCount == 0 && timesheetLine == null)
+                  throw new Exception("Could not create Administrative line to timesheet - Too many jobs in queue! Try again later");
+            }
          }
          else if (!string.IsNullOrWhiteSpace(entry.Comment))
          {

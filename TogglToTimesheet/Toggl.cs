@@ -44,7 +44,7 @@
             if (workspace == null)
                 throw new Exception("Could not find workspace 'Net Group' from Toggl");
 
-            var togglEntries = GetEntries()?.Where(e => e.wid.Equals(workspace.id)).ToArray();
+            var togglEntries = GetEntries()?.Where(e => e.wid.Equals(workspace.id) && e.tags != null && e.tags.Any()).ToArray();
             return AddProjectNames(togglEntries, workspace.id);
         }
 
