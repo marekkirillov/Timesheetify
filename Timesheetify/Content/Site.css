@@ -1,17 +1,17 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background: #f2f2f2 url('doodles.png');
+    color: #465462;
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 520px !important;
+    }
 }
 
 /* Set padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-body {
-    background-image: url(doodles.png)
-}
 
 .body-content footer {
     text-align: center;
@@ -19,23 +19,40 @@ body {
 
 .main-form {
     background-color: white;
-    border: 1px solid #b0b0b0;
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 20px;
-    margin-top: 20px;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+    padding: 0 65px;
+    padding: 50px 75px 85px;
 }
 
-input.form-control {
-    color: black;
+.main-form h2 {
+   margin-bottom: 25px;
 }
 
-/*.form-group {
-    margin-right: -15px;
-    width: 85%;
-    margin-left: -15px;
-    text-align: center;
-}*/
+#timesheet-to-toggl,
+#toggl-to-timesheet {
+    padding-left: 30px;    
+}
+
+    #timesheet-to-toggl:before,
+    #toggl-to-timesheet:before {
+        content: ' ';
+        left: 10px;
+        top: 8px;
+        height: 50%;
+        width: 50%;
+        position: absolute;
+        background-size: contain;
+        background-repeat: no-repeat; 
+    }
+
+    
+    #timesheet-to-toggl:before {
+        background-image: url('toggle.png');
+    }
+
+    #toggl-to-timesheet:before {
+        background-image: url('pwa.png');
+    }
 
 .status {
     font-size: 70px;
@@ -114,6 +131,21 @@ body.modal-open, .modal-open .navbar-fixed-top, .modal-open .navbar-fixed-bottom
     to {-webkit-transform: scale(1, 1);}
 }
 
-.modal-footer{
-    margin-top:0;
+#help {
+    margin-top: 45px;
+}
+
+.modal-content {
+    border-radius: 0;
+    border: none;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+}
+
+.modal-backdrop.in {
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+}
+
+.modal-footer {
+    margin-top: 0;
 }

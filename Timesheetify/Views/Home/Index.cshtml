@@ -18,42 +18,45 @@ else if (Model.ShowSuccess)
 @using (Html.BeginForm("Save", "Home"))
 {
 
-    <div class="panel-body form-horizontal main-form">
-      <div class="form-group">
-        <label class="col-sm-3 control-label">User</label>
-        <div class="col-sm-9">
-          @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="col-sm-3 control-label">Toggl API token</label>
-        <div class="col-sm-9">
-          <div class="input-group">
-            @Html.TextBoxFor(m => m.ApiKey, new { @class = "form-control", id = "togglKey" })
-            <span class="input-group-btn">
-              <input type="submit" class="btn btn-primary" value="Save" />
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="col-sm-3 control-label">Timesheet to <a href="https://www.toggl.com/app/">Toggl</a></label>
-        <div class="col-sm-9">
-          <button type="button" class="btn btn-primary pull-left action" data-toggle="modal" data-target="#m2">Start sync</button>
-          @*@Html.ActionLink("Start sync", "UpdateToggl", null, new { @class = "btn btn-default pull-left" })*@
-        </div>
-      </div>
+  <div class="main-form">
+    <h2 class="text-center">Synchronize</h2>
+    <div class="form-group">
+      <label class="control-label">User</label>
+      @Html.TextBoxFor(m => m.Name, new {@class = "form-control", @readonly = "readonly"})
+    </div>
 
-      <div class="form-group">
-        <label class="col-sm-3 control-label">
-          Toggl to <a href="http://projects.netgroupdigital.com/PWA/Timesheet.aspx">Timesheet</a>
-        </label>
-        <div class="col-sm-9">
-          <button type="button" class="btn btn-primary pull-left action" data-toggle="modal" data-target="#m1">Start sync</button>
-          @*@Html.ActionLink("Start sync", "UpdateTimesheet", null, new { @class = "btn btn-default pull-left" })*@
-        </div>
+    <div class="form-group">
+      <label class="control-label">Toggl API token</label>
+      <div class="input-group">
+        @Html.TextBoxFor(m => m.ApiKey, new {@class = "form-control", id = "togglKey"})
+        <span class="input-group-btn">
+          <input type="submit" class="btn btn-primary" value="Save"/>
+        </span>
       </div>
     </div>
+
+    @*<div class="form-group">
+      <label class="col-sm-3 control-label">Timesheet to <a href="https://www.toggl.com/app/">Toggl</a></label>
+      <div class="col-sm-9">
+        <button type="button" class="btn btn-primary pull-left action" data-toggle="modal" data-target="#m2">Start sync</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-3 control-label">
+        Toggl to <a href="http://projects.netgroupdigital.com/PWA/Timesheet.aspx">Timesheet</a>
+      </label>
+      <div class="col-sm-9">
+        <button type="button" class="btn btn-primary pull-left action" data-toggle="modal" data-target="#m1">Start sync</button>
+      </div>
+    </div>*@
+
+    <label class="control-label">Synchronize</label>
+    <div class="btn-group btn-group-justified">
+      <a href="#" class="btn btn-default" data-toggle="modal" data-target="#m2" id="timesheet-to-toggl">Timesheet to Toggl</a>
+      <a href="#" class="btn btn-default" role="button" data-toggle="modal" data-target="#m1" id="toggl-to-timesheet">Toggl to Timesheet</a>
+    </div>
+  </div>
 }
 
 
@@ -69,7 +72,7 @@ else if (Model.ShowSuccess)
       @using (Html.BeginForm("UpdateTimesheet", "Home"))
       { <div class="modal-body">
 
-          <div class="panel-body form-horizontal">
+          <div class="form-horizontal">
             <div class="form-group">
               <label class="col-sm-3 control-label">User</label>
               <div class="col-sm-9">
@@ -102,7 +105,7 @@ else if (Model.ShowSuccess)
       @using (Html.BeginForm("UpdateToggl", "Home"))
       { <div class="modal-body">
       
-          <div class="panel-body form-horizontal">
+          <div class="form-horizontal">
             <div class="form-group">
               <label class="col-sm-3 control-label">User</label>
               <div class="col-sm-9">
