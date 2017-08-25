@@ -37,14 +37,27 @@
             };
         }
 
-        public TogglEntry[] GetCurrentWeekEntries()
+        public TogglEntry[] GetWeekEntries(DateTime? startDate = null)
         {
+            DateTime endDate;
+
             var workspace = GetTogglWorkspace();
 
             if (workspace == null)
                 throw new Exception("Could not find workspace 'Net Group' from Toggl");
 
-            var togglEntries = GetEntries()?.Where(e => e.wid.Equals(workspace.id) && e.tags != null && e.tags.Any()).ToArray();
+            if (startDate == null)
+            {
+               startDate = DateTime.Today.AddDays(-1 * (int) DateTime.Today.DayOfWeek).Date;
+               endDate = DateTime.Now.AddDays(1);
+            }
+            else
+            {
+               //todo: peaks kontrollima, et kui on sama nädal ka?
+               endDate = startDate.Value.AddDays(6);
+            }
+
+            var togglEntries = GetEntries(startDate.Value, endDate)?.Where(e => e.wid.Equals(workspace.id) && e.tags != null && e.tags.Any()).ToArray();
             return AddProjectNames(togglEntries, workspace.id);
         }
 
@@ -96,12 +109,8 @@
             return i;
         }
 
-        private TogglEntry[] GetEntries()
+        private TogglEntry[] GetEntries(DateTime startDate, DateTime endDate)
         {
-
-            var startDate = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).Date;
-            var endDate = DateTime.Now.AddDays(1);
-
             var startDateFormatted = HttpUtility.UrlEncode(startDate.ToString("o"));
             var endDateFormatted = HttpUtility.UrlEncode(endDate.ToString("o"));
 

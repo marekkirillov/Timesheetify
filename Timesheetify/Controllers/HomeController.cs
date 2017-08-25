@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Web.Mvc;
 
 namespace Timesheetify.Controllers
 {
@@ -10,7 +11,6 @@ namespace Timesheetify.Controllers
    using Models;
    using TogglToTimesheet;
    using System.Web.Http;
-   using NG.Timesheetify.Common.Active_Directory;
    using TogglToTimesheet.Active_Directory;
    using User = NG.Timesheetify.Common.Active_Directory.User;
 
@@ -63,9 +63,39 @@ namespace Timesheetify.Controllers
             model.ShowSuccess = Redirected;
             model.Error = Error;
             model.Success = Success;
+            model.Weeks = GetListOfPreviousMondays();
          }
 
          return View(model);
+      }
+
+      private static IList<SelectListItem> GetListOfPreviousMondays()
+      {
+         var list = new List<SelectListItem>();
+         var today = (int)DateTime.Today.DayOfWeek;
+         var currentMonth = DateTime.Today.Month;
+         var isLastMonthMondayAdded = false;
+
+         const int maxWeeks = 5;
+
+         while (list.Count < maxWeeks)
+         {
+            var monday = DateTime.Today.AddDays(-today + (int)DayOfWeek.Monday - list.Count * 7);
+
+            if (monday.Month != currentMonth)
+            {
+               if (isLastMonthMondayAdded) break;
+               isLastMonthMondayAdded = true;
+            }
+
+            list.Add(new SelectListItem
+            {
+               Value = monday.ToString("O"),
+               Text = monday.ToShortDateString()
+            });
+         }
+
+         return list;
       }
 
       public ActionResult Save(Model model)
@@ -101,7 +131,8 @@ namespace Timesheetify.Controllers
          {
             try
             {
-               var result = Program.UpdateTimesheet(key, GetUser(model.Password));
+               //todo: peaks valideerima etteantud kuupäeva
+               var result = Program.UpdateTimesheet(key, GetUser(model.Password), model.SelectedWeek);
                Success = $"Successfully added {result} entries to Timesheet";
                LogRequest(Action.TogglToTimesheet, Success);
             }

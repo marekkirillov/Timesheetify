@@ -1,26 +1,21 @@
 ﻿namespace TogglToTimesheet
 {
    using System;
-   using System.Collections.Generic;
-   using System.DirectoryServices.AccountManagement;
-   using System.Globalization;
    using System.Linq;
    using System.Net;
-   using System.ServiceModel.Web;
    using System.Text;
    using System.Threading;
    using Common;
    using DTO;
    using Microsoft.ProjectServer.Client;
    using Microsoft.SharePoint.Client;
-   using PSLibrary = Microsoft.Office.Project.Server.Library;
    using User = NG.Timesheetify.Common.Active_Directory.User;
 
    public static class Timesheet
    {
       public static string ItemInProgress;
 
-      public static void FillCurrentWeek(TimesheetEntry[] timesheetEntries, User user)
+      public static void FilltWeek(TimesheetEntry[] timesheetEntries, User user, DateTime? startDate = null)
       {
          using (var projectContext = new ProjectContext(Constants.PwaPath))
          {
@@ -30,7 +25,7 @@
             if (timesheetEntries == null)
                return;
 
-            var firstDayOfWeek = GetFirstDayOfWeek();
+            var firstDayOfWeek = startDate ?? GetFirstDayOfWeek();
 
             LoadInitialData(projectContext, firstDayOfWeek);
 

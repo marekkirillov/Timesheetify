@@ -1,4 +1,5 @@
-﻿@model Timesheetify.Models.Model
+﻿@using Timesheetify.Extensions
+@model Timesheetify.Models.Model
 
 @if (!string.IsNullOrEmpty(Model.Error))
 {
@@ -85,6 +86,15 @@ else if (Model.ShowSuccess)
               @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
             </div>
           </div>
+          @if (User.Identity.IsBeetaTeamMember())
+          {
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Week to sync</label>
+              <div class="col-sm-9">
+                @Html.DropDownListFor(m => m.SelectedWeek, Model.Weeks, new { @class = "form-control" })
+              </div>
+            </div>
+          }
         </div>
       </div>
       <div class="modal-footer">

@@ -30,15 +30,15 @@
             TimesheetifyCore.Install();
         }
 
-        public static int UpdateTimesheet(string toggleKey, User user)
+        public static int UpdateTimesheet(string toggleKey, User user, DateTime? startDate = null)
         {
             var toggl = new Toggl(toggleKey);
 
-            var entries = toggl.GetCurrentWeekEntries()
+            var entries = toggl.GetWeekEntries(startDate)
                 .ToTimesheetEntries()
                 .MergeSameDayEntries();
 
-            Timesheet.FillCurrentWeek(entries, user);
+            Timesheet.FilltWeek(entries, user, startDate);
 
             return entries.Length;
         }

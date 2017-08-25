@@ -8,5 +8,6 @@
         public const string ProjectServerTagPrefix = "PS:";
         public const string AdministrativeWork = "Administrative";
         public const string ZeroHour = "0h";
+        public const string Beeta = "Beeta";
     }
 }

@@ -262,6 +262,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Worker.tt</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\IdentityExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
