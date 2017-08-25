@@ -26,8 +26,7 @@
             return new User
             {
                 DisplayName = adSearchResult.Properties["displayname"][0].ToString(),
-                AccountName = adSearchResult.Properties["samaccountname"][0].ToString(),
-                Email = adSearchResult.Properties["mail"][0].ToString()
+                AccountName = adSearchResult.Properties["samaccountname"][0].ToString()
             };
         }
 
