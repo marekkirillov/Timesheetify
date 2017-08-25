@@ -266,3 +266,4 @@ __pycache__/
 *.user
 *.suo
 Logs/Log.txt
+*.txt
