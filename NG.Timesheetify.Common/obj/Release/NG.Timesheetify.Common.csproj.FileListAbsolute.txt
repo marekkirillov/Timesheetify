@@ -1,5 +1,0 @@
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\bin\Release\NG.Timesheetify.Common.dll
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\bin\Release\NG.Timesheetify.Common.pdb
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\obj\Release\NG.Timesheetify.Common.csprojResolveAssemblyReference.cache
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\obj\Release\NG.Timesheetify.Common.dll
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\obj\Release\NG.Timesheetify.Common.pdb
