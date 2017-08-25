@@ -64,7 +64,7 @@
                if (project == null)
                   throw new Exception($"Could not find project {projectGroup.Key} from project server");
 
-               LoadMyAssignments(projectContext, project, user.DisplayName);
+               LoadMyAssignments(projectContext, project, user.Email);
 
                foreach (var entry in projectGroup)
                {
@@ -101,7 +101,7 @@
             {
                result.Projects.Add(project.Name);
 
-               LoadMyAssignments(projectContext, project, user.DisplayName);
+               LoadMyAssignments(projectContext, project, user.Email);
 
                foreach (var projectAssignment in project.Assignments)
                {
@@ -182,13 +182,13 @@
          return weeklyTimesheet;
       }
 
-      private static void LoadMyAssignments(ProjectContext projectContext, PublishedProject project, string user)
+      private static void LoadMyAssignments(ProjectContext projectContext, PublishedProject project, string email)
       {
          projectContext.Load(project.Assignments,
              assignments => assignments
              .IncludeWithDefaultProperties(assignment => assignment.Task, assignment => assignment.Owner,
                  assignment => assignment.Task.Parent)
-             .Where(a => a.Owner.Title == user));
+             .Where(a => a.Owner.Email == email));
 
          projectContext.ExecuteQuery();
       }

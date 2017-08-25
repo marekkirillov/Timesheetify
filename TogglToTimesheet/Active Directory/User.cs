@@ -7,5 +7,6 @@
         public string Password { get; set; }
 
         public bool UseDefaultCredentials { get; set; }
+       public string Email { get; set; }
     }
 }
