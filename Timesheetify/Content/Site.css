@@ -7,7 +7,7 @@
 
 @media (min-width: 992px) {
     .container {
-        max-width: 520px !important;
+        max-width: 480px !important;
     }
 }
 
@@ -21,32 +21,59 @@ h1#heading {
     background-color: white;
     box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
     padding: 0 65px;
-    padding: 50px 75px 125px 75px;
+    padding: 50px 35px 125px 35px;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     height: 418px;
+    overflow: hidden
 }
 
-    .main-form.loading {
-        transform: rotateY(180deg);
+@media (min-width: 768px) {
+    .main-form {
+        padding-left: 60px;
+        padding-right: 60px;
     }
+}
 
-        .main-form.loading .front {
-            display: none;
-        }
+.main-form .front:before {
+    position: absolute;
+    display: block;
+    content: 'beeta';
+    text-align: center;
+    width: 130px;
+    height: 30px;
+    line-height: 25px;
+    right: -10px;
+    top: 0;
+    transform: translate(20px, 20px) rotate(45deg);
+    background-color: #fd3641;
+    color: #fff;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 3px 0;
+}
 
-        .main-form.loading .back {
-            display: block;
-        }
+.main-form.loading {
+    transform: rotateY(180deg);
+}
 
-    .main-form .back {
+    .main-form.loading .front {
         display: none;
-        transform: rotateY(180deg);
     }
 
-    .main-form h2 {
-        margin-bottom: 25px;
+    .main-form.loading .back {
+        display: block;
     }
+
+.main-form .back {
+    display: none;
+    transform: rotateY(180deg);
+}
+
+.main-form h2 {
+    margin-bottom: 25px;
+}
 
 #help {
     margin-top: 45px;
@@ -90,6 +117,11 @@ button {
         box-shadow: none;
     }
 
+.input-group-btn .btn {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
 .btn-primary {
     background-color: #38acfc;
 }
@@ -115,6 +147,13 @@ button {
     height: 55px;
 }
 
+@media (min-width: 768px) {
+    #timesheet-to-toggl,
+    #toggl-to-timesheet {
+        font-size: 14px;
+    }
+}
+
 #timesheet-to-toggl {
     border-right: 1px solid #ebebeb;
 }
@@ -122,19 +161,30 @@ button {
     #timesheet-to-toggl:before,
     #toggl-to-timesheet:before {
         content: ' ';
-        left: 15px;
+        left: 0;
         top: 14px;
         height: 27px;
-        width: 27px;
+        width: 100%;
         position: absolute;
         background-size: contain;
         background-repeat: no-repeat;
+        background-position: center;
     }
 
-
-    #timesheet-to-toggl:before {
-        background-image: url('toggle.png');
+@media (min-width: 768px) {
+    #timesheet-to-toggl:before,
+    #toggl-to-timesheet:before {
+        height: 27px;
+        width: 27px;
+        left: 15px;
+        width: 27px;
     }
+}
+
+
+#timesheet-to-toggl:before {
+    background-image: url('toggle.png');
+}
 
 #toggl-to-timesheet:before {
     background-image: url('pwa.png');
