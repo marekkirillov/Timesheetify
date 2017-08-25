@@ -83,7 +83,7 @@
       public static TogglProjectsAndTags GenerateTogglData(User user)
       {
          var result = new TogglProjectsAndTags();
-         var startDate = DateTime.Now.AddMonths(-20);
+         var startDate = DateTime.Now.AddMonths(-18);
          var endDate = DateTime.Now.AddDays(-30);
 
          using (var projectContext = new ProjectContext(Constants.PwaPath))
@@ -91,8 +91,10 @@
             if (!user.UseDefaultCredentials)
                projectContext.Credentials = new NetworkCredential(user.AccountName, user.Password);
 
-            LoadProjects(projectContext, startDate);
+            projectContext.Load(projectContext.Projects, projects => projects.Where(p => (p.StartDate > startDate && endDate > p.FinishDate) || p.StartDate == p.FinishDate)
+               .IncludeWithDefaultProperties(p => p.ProjectResources, pr => pr.Name));
 
+            projectContext.ExecuteQuery();
             var myProjects = GetPublishedProjects(user, projectContext);
 
             foreach (var project in myProjects)
@@ -127,21 +129,13 @@
          return result;
       }
 
-      private static void LoadProjects(ProjectContext projectContext, DateTime startDate)
-      {
-         projectContext.Load(projectContext.Projects, projects => projects.Where(p => p.StartDate > startDate)
-            .IncludeWithDefaultProperties(p => p.ProjectResources, pr => pr.Name));
-
-         projectContext.ExecuteQuery();
-      }
-
-      private static IList<PublishedProject> GetPublishedProjects(User user, ProjectContext projectContext)
+      private static IQueryable<PublishedProject> GetPublishedProjects(User user, ProjectContext projectContext)
       {
          var myProjects =
             projectContext.Projects.Where(
                p => p.ProjectResources.Any(pr => pr.Name.Equals(user.DisplayName)));
 
-         return myProjects.ToList();
+         return myProjects;
       }
 
       private static void AddAdministrativeTasks(TogglProjectsAndTags result, User user)
@@ -190,6 +184,9 @@
 
       private static void LoadMyAssignments(ProjectContext projectContext, PublishedProject project, string user)
       {
+         projectContext.Load(project.Assignments);
+         projectContext.ExecuteQuery();
+
          projectContext.Load(project.Assignments,
              assignments => assignments
              .IncludeWithDefaultProperties(assignment => assignment.Task, assignment => assignment.Owner,

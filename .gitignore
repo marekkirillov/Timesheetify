@@ -265,3 +265,4 @@ __pycache__/
 [Bb]in
 *.user
 *.suo
+/Timesheetify/Logs/Log.txt
