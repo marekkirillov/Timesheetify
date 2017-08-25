@@ -1,4 +1,0 @@
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\bin\Debug\NG.Timesheetify.Common.dll
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\bin\Debug\NG.Timesheetify.Common.pdb
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\obj\Debug\NG.Timesheetify.Common.dll
-C:\Projects\TogglToTimesheet\NG.Timesheetify.Common\obj\Debug\NG.Timesheetify.Common.pdb
