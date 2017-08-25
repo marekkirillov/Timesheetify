@@ -184,9 +184,6 @@
 
       private static void LoadMyAssignments(ProjectContext projectContext, PublishedProject project, string user)
       {
-         projectContext.Load(project.Assignments);
-         projectContext.ExecuteQuery();
-
          projectContext.Load(project.Assignments,
              assignments => assignments
              .IncludeWithDefaultProperties(assignment => assignment.Task, assignment => assignment.Owner,
