@@ -131,7 +131,7 @@
     </Reference>
     <Reference Include="ProjectServerServices, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ProjectServerServices\ProjectServerServices.dll</HintPath>
+      <HintPath>.\ProjectServerServices.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
