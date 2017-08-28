@@ -140,7 +140,7 @@
          var rows = TimeSheetExtended.GetAdministrativeRows(user);
 
          foreach (var task in rows.Keys)
-            result.AddTags($"PS: {task}");
+            result.AddTags($"PS: {task} > Administrative");
       }
 
       private static void LoadInitialData(ProjectContext projectContext, DateTime firstDayOfWeek)
@@ -251,7 +251,7 @@
 
       private static TimeSheetLine GetAdministrativeTimeSheetLine(TimeSheetPeriod weeklyTimesheet, TimesheetEntry entry, ProjectContext projectContext, User user)
       {
-         var taskName = entry.TaskHierarchy.Last();
+         var taskName = entry.TaskHierarchy.First();
          var timesheetLine = FindTimesheetLine(weeklyTimesheet, taskName, Constants.AdministrativeWork);
          var retryCount = 10;
 

@@ -34,16 +34,19 @@
 
       private static TimesheetEntry Convert(TogglEntry entry)
       {
-         return new TimesheetEntry
+         var item = new TimesheetEntry
          {
             Start = entry.start,
-            End = entry.stop,
             Duration = GetDuration(entry),
             Project = entry.TogglProject?.name,
             TaskHierarchy = ParseHierarchy(entry),
             TaskIdentifier = GetTag(entry),
             Comment = entry.description
          };
+
+         item.End = entry.stop == DateTime.MinValue ? item.End = item.Start.Add(item.Duration) : entry.stop;
+
+         return item;
       }
 
       private static TimeSpan GetDuration(TogglEntry entry)
