@@ -211,7 +211,7 @@ namespace Timesheetify.Controllers
 
       private string GetPath()
       {
-         var path = Path.Combine(Server.MapPath("~"), "Logs");
+         var path = "C:\\Logs\\Timesheetify";
 
          if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
