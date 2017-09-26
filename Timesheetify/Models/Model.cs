@@ -17,6 +17,8 @@ namespace Timesheetify.Models
         public bool ShowSuccess { get; set; }
         public string Error { get; set; }
 
+	    public bool ToggleCleanup { get; set; }
+
         public string Success { get; set; }
         public string Password { get; set; }
 

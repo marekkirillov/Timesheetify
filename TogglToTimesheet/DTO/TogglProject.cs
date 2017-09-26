@@ -6,11 +6,11 @@ namespace TogglToTimesheet.DTO
     {
         public string id { get; set; }
         public string wid { get; set; }
-        public string pid { get; set; }
+        public string cid { get; set; }
         public string name { get; set; }
         public bool billable { get; set; }
-        public string is_private { get; set; }
-        public string active { get; set; }
+        public bool is_private { get; set; }
+        public bool active { get; set; }
         public DateTime at { get; set; }
         public string color { get; set; }
     }

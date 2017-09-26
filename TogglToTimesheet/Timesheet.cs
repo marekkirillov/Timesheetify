@@ -86,7 +86,7 @@
             if (!user.UseDefaultCredentials)
                projectContext.Credentials = new NetworkCredential(user.AccountName, user.Password);
 
-            projectContext.Load(projectContext.Projects, projects => projects.Where(p => (p.StartDate > startDate && endDate > p.FinishDate) || p.StartDate == p.FinishDate)
+            projectContext.Load(projectContext.Projects, projects => projects.Where(p => (p.StartDate > startDate && p.FinishDate > endDate) || p.StartDate == p.FinishDate)
                .IncludeWithDefaultProperties(p => p.ProjectResources, pr => pr.Name));
 
             projectContext.ExecuteQuery();
@@ -129,6 +129,9 @@
          var myProjects =
             projectContext.Projects.Where(
                p => p.ProjectResources.Any(pr => pr.Name.Equals(user.DisplayName)));
+
+	      var projectResources = projectContext.Projects.Select(p =>
+		      p.Name + " - " + string.Join(";", p.ProjectResources.Select(pr => pr.Name)));
 
          return myProjects;
       }

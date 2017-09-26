@@ -1,150 +1,209 @@
 ﻿namespace TogglToTimesheet
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using System.Web;
-    using DTO;
-    using Newtonsoft.Json;
+	using System;
+	using System.Collections.Generic;
+	using System.Configuration;
+	using System.IO;
+	using System.Linq;
+	using System.Net;
+	using System.Net.Http;
+	using System.Net.Http.Headers;
+	using System.Text;
+	using System.Web;
+	using DTO;
+	using Newtonsoft.Json;
 
-    public class Toggl
-    {
-        private const string TogglUrl = "https://www.toggl.com/api/v8/";
-        private const string TogglTimeEntriesUrl = TogglUrl + "time_entries?start_date={0}&end_date={1}";
-        private const string TogglWorkspaceItemsUrl = TogglUrl + "workspaces/{0}/{1}";
-        private const string TogglWorkspacesUrl = TogglUrl + "workspaces";
-        private const string TogglTagsUrl = TogglUrl + "tags";
-        private const string TogglProjectUrl = TogglUrl + "projects";
-        private const string Workspace = "Net Group";
+	public class Toggl
+	{
+		private const string TogglUrl = "https://www.toggl.com/api/v8/";
+		private const string TogglTimeEntriesUrl = TogglUrl + "time_entries?start_date={0}&end_date={1}";
+		private const string TogglWorkspaceItemsUrl = TogglUrl + "workspaces/{0}/{1}";
+		private const string TogglWorkspacesUrl = TogglUrl + "workspaces";
+		private const string TogglTagsUrl = TogglUrl + "tags";
+		private const string TogglProjectUrl = TogglUrl + "projects";
+		private const string Workspace = "Net Group";
 
-        private readonly HttpClient _httpClient;
+		private readonly HttpClient _httpClient;
 
-        public Toggl(string apiKey)
-        {
-            var togglApiPwd = apiKey + ":api_token";
-            var togglPwdB64 = Convert.ToBase64String(Encoding.Default.GetBytes(togglApiPwd.Trim()));
-            var toggleAuthHeader = "Basic " + togglPwdB64;
+		public Toggl(string apiKey)
+		{
+			var togglApiPwd = apiKey + ":api_token";
+			var togglPwdB64 = Convert.ToBase64String(Encoding.Default.GetBytes(togglApiPwd.Trim()));
+			var toggleAuthHeader = "Basic " + togglPwdB64;
 
-            _httpClient = new HttpClient
-            {
-                DefaultRequestHeaders = { { "Authorization", toggleAuthHeader } }
-            };
-        }
+			_httpClient = new HttpClient
+			{
+				DefaultRequestHeaders = { { "Authorization", toggleAuthHeader } }
+			};
+		}
 
-        public TogglEntry[] GetWeekEntries(DateTime? startDate = null)
-        {
-            DateTime endDate;
+		public TogglEntry[] GetWeekEntries(DateTime? startDate = null)
+		{
+			DateTime endDate;
 
-            var workspace = GetTogglWorkspace();
+			var workspace = GetTogglWorkspace();
 
-            if (workspace == null)
-                throw new Exception("Could not find workspace 'Net Group' from Toggl");
+			if (workspace == null)
+				throw new Exception("Could not find workspace 'Net Group' from Toggl");
 
-            if (startDate == null)
-            {
-               startDate = DateTime.Today.AddDays(-1 * (int) DateTime.Today.DayOfWeek).Date;
-               endDate = DateTime.Now.AddDays(1);
-            }
-            else
-            {
-               //todo: peaks kontrollima, et kui on sama nädal ka?
-               endDate = startDate.Value.AddDays(6);
-            }
+			if (startDate == null)
+			{
+				startDate = DateTime.Today.AddDays(-1 * (int)DateTime.Today.DayOfWeek).Date;
+				endDate = DateTime.Now.AddDays(1);
+			}
+			else
+			{
+				//todo: peaks kontrollima, et kui on sama nädal ka?
+				endDate = startDate.Value.AddDays(6);
+			}
 
-            var togglEntries = GetEntries(startDate.Value, endDate)?.Where(e => e.wid.Equals(workspace.id) && e.tags != null && e.tags.Any()).ToArray();
-            return AddProjectNames(togglEntries, workspace.id);
-        }
+			var togglEntries = GetEntries(startDate.Value, endDate)?.Where(e => e.wid.Equals(workspace.id) && e.tags != null && e.tags.Any()).ToArray();
+			return AddProjectNames(togglEntries, workspace.id);
+		}
 
-        public Tuple<int, int> SyncProjectsAndTags(TogglProjectsAndTags data)
-        {
-            var workspace = GetTogglWorkspace();
+		public TimesheetToTogglResult SyncProjectsAndTags(TogglProjectsAndTags data, bool cleanup)
+		{
+			var workspace = GetTogglWorkspace();
 
-            if (workspace == null)
-                throw new Exception("Could not find workspace 'Net Group' from Toggl");
+			if (workspace == null)
+				throw new Exception("Could not find workspace 'Net Group' from Toggl");
 
-            return new Tuple<int, int>(AddOrUpdateProjects(data.Projects, workspace.id), AddOrUpdateTags(data.Tags, workspace.id));
-        }
+			return new TimesheetToTogglResult(AddOrUpdateProjects(data.Projects, workspace.id, cleanup), AddOrUpdateTags(data.Tags, workspace.id, cleanup));
+		}
 
-        private TogglWorkspace GetTogglWorkspace()
-        {
-            var workspaces = TogglGet<TogglWorkspace[]>(TogglWorkspacesUrl);
-            var workspace = workspaces.FirstOrDefault(w => w.name == Workspace);
-            return workspace;
-        }
+		private TogglWorkspace GetTogglWorkspace()
+		{
+			var workspaces = TogglGet<TogglWorkspace[]>(TogglWorkspacesUrl);
+			var workspace = workspaces.FirstOrDefault(w => w.name == Workspace);
+			return workspace;
+		}
 
-        private int AddOrUpdateProjects(List<string> dataProjects, string wid)
-        {
-            var projects = TogglGet<TogglProject[]>(TogglWorkspaceItemsUrl, wid, "projects")?.Select(t => t.name).ToList() ?? new List<string>();
-            var i = 0;
+		private ProjectsResult AddOrUpdateProjects(List<string> dataProjects, string wid, bool cleanup)
+		{
+			var projects = TogglGet<TogglProject[]>(TogglWorkspaceItemsUrl, wid, "projects")?.ToList() ?? new List<TogglProject>();
+			var projectNames = projects.Select(p => p.name).ToList();
+			var projectsToArchive = projects.Where(t => !dataProjects.Contains(t.name)).ToList();
 
-            foreach (var project in dataProjects)
-            {
-                if (projects.Contains(project))
-                    continue;
+			var i = 0;
+			foreach (var name in dataProjects)
+			{
+				if (projectNames.Contains(name))
+				{
+					var project = projects.First(p => p.name == name);
 
-                TogglPost<TogglProject, object>(TogglProjectUrl, new { project = new TogglProject { name = project, wid = wid } });
-                i++;
-            }
-            return i;
-        }
+					if (project.active)
+						continue;
 
-        private int AddOrUpdateTags(List<string> dataTags, string wid)
-        {
-            var tags = TogglGet<TogglTag[]>(TogglWorkspaceItemsUrl, wid, "tags")?.Select(t => t.name).ToList() ?? new List<string>();
-            var i = 0;
-            foreach (var tag in dataTags)
-            {
-                if (tags.Contains(tag))
-                    continue;
+					project.active = true;
+					TogglPut($"{TogglProjectUrl}/{project.id}", project);
+				}
+				else
+					TogglPost<TogglProject, object>(TogglProjectUrl, new { project = new TogglProject { name = name, wid = wid } });
 
-                TogglPost<TogglTag, object>(TogglTagsUrl, new { tag = new TogglTag { name = tag, wid = wid } });
-                i++;
-            }
-            return i;
-        }
+				i++;
+			}
 
-        private TogglEntry[] GetEntries(DateTime startDate, DateTime endDate)
-        {
-            var startDateFormatted = HttpUtility.UrlEncode(startDate.ToString("o"));
-            var endDateFormatted = HttpUtility.UrlEncode(endDate.ToString("o"));
+			var j = 0;
 
-            return TogglGet<TogglEntry[]>(TogglTimeEntriesUrl, startDateFormatted, endDateFormatted);
-        }
+			if (cleanup)
+			{
+				foreach (var togglProject in projectsToArchive)
+				{
+					togglProject.active = false;
+					TogglPut($"{TogglProjectUrl}/{togglProject.id}", new { project = togglProject });
+					j++;
+				}
+			}
 
-        private TogglEntry[] AddProjectNames(TogglEntry[] values, string workspaceId)
-        {
-            var projects = TogglGet<TogglProject[]>(TogglWorkspaceItemsUrl, workspaceId, "projects");
+			return new ProjectsResult(i, j);
+		}
 
-            foreach (var togglEntry in values)
-                togglEntry.TogglProject = projects.FirstOrDefault(p => p.id == togglEntry.pid);
+		private TagsResult AddOrUpdateTags(List<string> dataTags, string wid, bool cleanup)
+		{
+			var tags = TogglGet<TogglTag[]>(TogglWorkspaceItemsUrl, wid, "tags")?.ToList() ?? new List<TogglTag>();
+			var tagNames = tags.Select(t => t.name).ToList();
+			var tagsToRemove = tags.Where(t => t.name.StartsWith("PS:") && !dataTags.Contains(t.name)).ToList();
 
-            return values;
-        }
+			var i = 0;
+			foreach (var tag in dataTags)
+			{
+				if (tagNames.Contains(tag))
+					continue;
+
+				TogglPost<TogglTag, object>(TogglTagsUrl, new { tag = new TogglTag { name = tag, wid = wid } });
+				i++;
+			}
 
 
-        private T TogglPost<T, T1>(string url, T1 data)
-        {
-            var requestData = JsonConvert.SerializeObject(data, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-            var content = new StringContent(requestData);
+			var j = 0;
+			if (cleanup)
+			{
+				foreach (var togglTag in tagsToRemove)
+				{
+					TogglDelete($"{TogglTagsUrl}/{togglTag.id}");
+					j++;
+				}
+			}
 
-            content.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/json");
+			return new TagsResult(i, j);
+		}
 
-            var result = _httpClient.PostAsync(url, content).Result;
-            var response = result.Content.ReadAsStringAsync().Result;
+		private TogglEntry[] GetEntries(DateTime startDate, DateTime endDate)
+		{
+			var startDateFormatted = HttpUtility.UrlEncode(startDate.ToString("o"));
+			var endDateFormatted = HttpUtility.UrlEncode(endDate.ToString("o"));
 
-            return JsonConvert.DeserializeObject<T>(response);
-        }
+			return TogglGet<TogglEntry[]>(TogglTimeEntriesUrl, startDateFormatted, endDateFormatted);
+		}
 
-        private T TogglGet<T>(string url, params object[] @params)
-        {
-            var result = _httpClient.GetStringAsync(string.Format(url, @params)).Result;
-            return JsonConvert.DeserializeObject<T>(result);
-        }
-    }
+		private TogglEntry[] AddProjectNames(TogglEntry[] values, string workspaceId)
+		{
+			var projects = TogglGet<TogglProject[]>(TogglWorkspaceItemsUrl, workspaceId, "projects");
+
+			foreach (var togglEntry in values)
+				togglEntry.TogglProject = projects.FirstOrDefault(p => p.id == togglEntry.pid);
+
+			return values;
+		}
+
+
+		private T TogglPost<T, T1>(string url, T1 data)
+		{
+			var content = GetContent(data);
+			var result = _httpClient.PostAsync(url, content).Result;
+			var response = result.Content.ReadAsStringAsync().Result;
+
+			return JsonConvert.DeserializeObject<T>(response);
+		}
+
+		private static StringContent GetContent<T1>(T1 data)
+		{
+			var requestData =
+				JsonConvert.SerializeObject(data, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+			var content = new StringContent(requestData);
+
+			content.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/json");
+			return content;
+		}
+
+		private T TogglGet<T>(string url, params object[] @params)
+		{
+			var result = _httpClient.GetStringAsync(string.Format(url, @params)).Result;
+			return JsonConvert.DeserializeObject<T>(result);
+		}
+
+		private void TogglDelete(string url)
+		{
+			_httpClient.DeleteAsync(url);
+		}
+
+		private void TogglPut<T>(string url, T data)
+		{
+			var content = GetContent(data);
+			var result = _httpClient.PutAsync(url, content).Result;
+			var response = result.Content.ReadAsStringAsync().Result;
+			var _ = JsonConvert.DeserializeObject<T>(response);
+		}
+
+	}
 }

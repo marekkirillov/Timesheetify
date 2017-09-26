@@ -3,150 +3,157 @@
 
 @if (!string.IsNullOrEmpty(Model.Error))
 {
-  <div class="alert alert-danger" role="alert">@Model.Error</div>
+    <div class="alert alert-danger" role="alert">@Model.Error</div>
 }
 else if (Model.ShowSuccess)
 {
-  <div class="alert alert-success" role="alert">
-    @(Model.Success ?? "Changes saved.")
-  </div>
+    <div class="alert alert-success" role="alert">
+        @(Model.Success ?? "Changes saved.")
+    </div>
 }
 
 @using (Html.BeginForm("Save", "Home"))
 {
-  <div class="main-form-container">
-    <div class="main-form">
-      <div class="front">
-        <h2 class="text-center">Synchronize</h2>
-        <div class="form-group">
-          <label class="control-label">User</label>
-          @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
-        </div>
+    <div class="main-form-container">
+        <div class="main-form">
+            <div class="front">
+                <h2 class="text-center">Synchronize</h2>
+                <div class="form-group">
+                    <label class="control-label">User</label>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
+                </div>
 
-        <div class="form-group">
-          <label class="control-label">Toggl API token</label>
-          <div class="input-group">
-            @Html.TextBoxFor(m => m.ApiKey, new { @class = "form-control", id = "togglKey" })
-            <span class="input-group-btn">
-              <input type="submit" class="btn btn-primary" value="Save" />
-            </span>
-          </div>
-        </div>
+                <div class="form-group">
+                    <label class="control-label">Toggl API token</label>
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.ApiKey, new { @class = "form-control", id = "togglKey" })
+                        <span class="input-group-btn">
+                            <input type="submit" class="btn btn-primary" value="Save" />
+                        </span>
+                    </div>
+                </div>
 
-        <div id="main-form-actions">
-          <button class="btn action" data-toggle="modal" data-target="#m2" id="timesheet-to-toggl">
-            <span  class="hidden-xs">Timesheet to Toggl</span>
-          </button>
-          <button href="#" class="btn action" data-toggle="modal" data-target="#m1" id="toggl-to-timesheet">
-            <span  class="hidden-xs">Toggl to Timesheet</span>
-          </button>
-        </div>
-      </div>
+                <div id="main-form-actions">
+                    <button class="btn action" data-toggle="modal" data-target="#m2" id="timesheet-to-toggl">
+                        <span class="hidden-xs">Timesheet to Toggl</span>
+                    </button>
+                    <button href="#" class="btn action" data-toggle="modal" data-target="#m1" id="toggl-to-timesheet">
+                        <span class="hidden-xs">Toggl to Timesheet</span>
+                    </button>
+                </div>
+            </div>
 
-      <div class="back">
-        <div class="synchronizing">
-          <div class="pad">
-            <div class="line line1"></div>
-            <div class="line line2"></div>
-            <div class="line line3"></div>
-            <div class="line line4"></div>
-          </div>
-          <div class="text">
-            Please wait, this may take a while...
-          </div>
+            <div class="back">
+                <div class="synchronizing">
+                    <div class="pad">
+                        <div class="line line1"></div>
+                        <div class="line line2"></div>
+                        <div class="line line3"></div>
+                        <div class="line line4"></div>
+                    </div>
+                    <div class="text">
+                        Please wait, this may take a while...
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 }
 
 
 <!-- Modal -->
 <div class="modal fade" id="m1" role="dialog">
-  <div class="modal-dialog">
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Request authentication</h4>
-      </div>
-      @using (Html.BeginForm("UpdateTimesheet", "Home"))
-      { <div class="modal-body">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Request authentication</h4>
+            </div>
+            @using (Html.BeginForm("UpdateTimesheet", "Home"))
+            { <div class="modal-body">
 
-        <div class="form-horizontal">
-          <div class="form-group">
-            <label class="col-sm-3 control-label">User</label>
-            <div class="col-sm-9">
-              @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">User</label>
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Password</label>
+                    <div class="col-sm-9">
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    </div>
+                </div>
+                @if (User.Identity.IsBeetaTeamMember())
+                {
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Week to sync</label>
+                        <div class="col-sm-9">
+                            @Html.DropDownListFor(m => m.SelectedWeek, Model.Weeks, new { @class = "form-control" })
+                        </div>
+                    </div>
+}
             </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-3 control-label">Password</label>
-            <div class="col-sm-9">
-              @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-            </div>
-          </div>
-          @if (User.Identity.IsBeetaTeamMember())
-          {
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Week to sync</label>
-              <div class="col-sm-9">
-                @Html.DropDownListFor(m => m.SelectedWeek, Model.Weeks, new { @class = "form-control" })
-              </div>
-            </div>
-          }
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
-      </div>}
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
+        </div>}
+        </div>
     </div>
-  </div>
 </div>
 
 <div class="modal fade" id="m2" role="dialog">
-  <div class="modal-dialog">
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Request authentication</h4>
-      </div>
-      @using (Html.BeginForm("UpdateToggl", "Home"))
-      { <div class="modal-body">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Request authentication</h4>
+            </div>
+            @using (Html.BeginForm("UpdateToggl", "Home"))
+            { <div class="modal-body">
 
-        <div class="form-horizontal">
-          <div class="form-group">
-            <label class="col-sm-3 control-label">User</label>
-            <div class="col-sm-9">
-              @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">User</label>
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Password</label>
+                    <div class="col-sm-9">
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    </div>
+                </div>
+                @*<div class="form-group">
+                    <label class="col-sm-3 control-label">Cleanup</label>
+                    <div class="col-sm-9">
+                        @Html.CheckBoxFor(m => m.ToggleCleanup, new { @class = "form-control" })
+                    </div>
+                </div>*@
             </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-3 control-label">Password</label>
-            <div class="col-sm-9">
-              @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-            </div>
-          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
-      </div>}
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
+        </div>}
+        </div>
     </div>
-  </div>
 </div>
 
 <script type="text/javascript">
-  $(function () {
-    $("button.submit").click(function () {
-      $(this).closest("form").submit();
+    $(function () {
+        $("button.submit").click(function () {
+            $(this).closest("form").submit();
 
-      setTimeout(function () {
-        $('.main-form').toggleClass('loading');
-      }, 1000);
+            setTimeout(function () {
+                $('.main-form').toggleClass('loading');
+            }, 1000);
 
-      $("input, button.action").prop("disabled", "disabled");
+            $("input, button.action").prop("disabled", "disabled");
+        });
+        $('.alert').delay(6000).hide('400');
     });
-  });
 </script>
