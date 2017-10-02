@@ -74,8 +74,8 @@ namespace Timesheetify.Controllers
 		{
 			var list = new List<SelectListItem>();
 			var today = (int)DateTime.Today.DayOfWeek;
-			var currentMonth = DateTime.Today.Month;
-			var isLastMonthMondayAdded = false;
+			//var currentMonth = DateTime.Today.Month;
+			//var isLastMonthMondayAdded = false;
 
 			const int maxWeeks = 5;
 
@@ -83,11 +83,11 @@ namespace Timesheetify.Controllers
 			{
 				var monday = DateTime.Today.AddDays(-today + (int)DayOfWeek.Monday - list.Count * 7);
 
-				if (monday.Month != currentMonth)
-				{
-					if (isLastMonthMondayAdded) break;
-					isLastMonthMondayAdded = true;
-				}
+				//if (monday.Month != currentMonth)
+				//{
+				//	if (isLastMonthMondayAdded) break;
+				//	isLastMonthMondayAdded = true;
+				//}
 
 				list.Add(new SelectListItem
 				{
