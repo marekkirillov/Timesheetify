@@ -20,5 +20,13 @@
 
             Tags.Add(tag);
         }
+
+        public void AddProjects(string project)
+        {
+            if (Projects.Contains(project))
+                return;
+
+            Projects.Add(project);
+        }
     }
 }

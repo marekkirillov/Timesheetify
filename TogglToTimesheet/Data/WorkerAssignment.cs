@@ -7,15 +7,20 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timesheetify.Data
+namespace TogglToTimesheet.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Worker
+    public partial class WorkerAssignment
     {
         public int Id { get; set; }
-        public string Identity { get; set; }
-        public string TogglApiKey { get; set; }
+        public string Tag { get; set; }
+        public System.Guid ProjectGuid { get; set; }
+        public System.Guid TaskGuid { get; set; }
+        public System.Guid AssignmentGuid { get; set; }
+        public int WorkerId { get; set; }
+    
+        public virtual Worker Worker { get; set; }
     }
 }

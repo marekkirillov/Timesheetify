@@ -20,7 +20,6 @@ namespace Timesheetify.Models
 	    public bool ToggleCleanup { get; set; }
 
         public string Success { get; set; }
-        public string Password { get; set; }
 
         public IList<SelectListItem> Weeks { get; set; }
         public DateTime? SelectedWeek { get; set; }

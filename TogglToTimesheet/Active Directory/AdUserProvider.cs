@@ -27,13 +27,16 @@
             {
                 DisplayName = adSearchResult.Properties["displayname"][0].ToString(),
                 AccountName = adSearchResult.Properties["samaccountname"][0].ToString(),
-                Department = adSearchResult.Properties["department"][0].ToString()
+                Department = adSearchResult.Properties["department"][0].ToString(),
+
             };
         }
 
         public static User GetUserByIdentityName(string name)
         {
-            return GetUserByAccountName(name.Split('\\').Last().Trim());
+            var user = GetUserByAccountName(name.Split('\\').Last().Trim());
+            user.Identity = name;
+            return user;
         }
     }
 }

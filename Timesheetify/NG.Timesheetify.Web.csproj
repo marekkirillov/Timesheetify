@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -128,6 +129,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
@@ -244,25 +246,6 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Data\Worker.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Worker.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Worker.cs">
-      <DependentUpon>Worker.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Worker.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Worker.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Worker1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Worker.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Extensions\IdentityExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -277,16 +260,6 @@
     <Content Include="Content\doodles.png" />
     <Content Include="Content\pwa.png" />
     <Content Include="Content\toggle.png" />
-    <Content Include="Data\Worker.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Worker.edmx</DependentUpon>
-      <LastGenOutput>Worker.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Data\Worker.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Worker.edmx</DependentUpon>
-      <LastGenOutput>Worker1.cs</LastGenOutput>
-    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -313,13 +286,6 @@
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <EntityDeploy Include="Data\Worker.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Worker.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Data\Worker.edmx.diagram">
-      <DependentUpon>Worker.edmx</DependentUpon>
     </Content>
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />

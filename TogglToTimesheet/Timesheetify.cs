@@ -2,28 +2,52 @@
 {
     using System;
     using Converters;
+    using Data;
     using DTO;
-    using NG.Timesheetify.Common.Active_Directory;
+    using Repository;
 
     public static class Timesheetify
     {
-		public static int UpdateTimesheet(string toggleKey, User user, DateTime? startDate = null)
+	    public static string CurrentAccountName;
+
+        public static TogglToTimesheetResult UpdateTimesheet(string accountName, DateTime? startDate = null)
         {
-            var toggl = new Toggl(toggleKey);
+	        CurrentAccountName = accountName;
+
+            var worker = WorkerRepository.GetCurrentWorker();
+
+            CheckAPIKey(worker);
+
+            var toggl = new Toggl(worker.TogglApiKey);
 
             var entries = toggl.GetWeekEntries(startDate)
                 .ToTimesheetEntries()
                 .MergeSameDayEntries();
 
-            Timesheet.FilltWeek(entries, user, startDate);
+            Timesheet.FillWeek(entries, startDate);
 
-            return entries.Length;
+            return new TogglToTimesheetResult(entries.Length);
         }
 
-        public static TimesheetToTogglResult UpdateToggl(string toggleKey, User user, bool cleanup)
+        public static TimesheetToTogglResult UpdateToggl(string accountName)
         {
-            var items = Timesheet.GenerateTogglData(user);
-            return new Toggl(toggleKey).SyncProjectsAndTags(items, cleanup);
+	        CurrentAccountName = accountName;
+
+			var worker = WorkerRepository.GetCurrentWorker();
+
+            CheckAPIKey(worker);
+
+            var items = Timesheet.GenerateTogglData(accountName);
+
+            WorkerRepository.SaveWorkerAssignments(items, worker);
+
+            return new Toggl(worker.TogglApiKey).SyncProjectsAndTags(items.ToTogglProjectsAndTags(), false);
+        }
+
+        private static void CheckAPIKey(Worker worker)
+        {
+            if (string.IsNullOrEmpty(worker?.TogglApiKey))
+                throw new Exception("Toggl API key not found");
         }
     }
 }

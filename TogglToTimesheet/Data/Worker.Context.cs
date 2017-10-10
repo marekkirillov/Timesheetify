@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timesheetify.Data
+namespace TogglToTimesheet.Data
 {
     using System;
     using System.Data.Entity;
@@ -26,5 +26,6 @@ namespace Timesheetify.Data
         }
     
         public virtual DbSet<Worker> Workers { get; set; }
+        public virtual DbSet<WorkerAssignment> WorkerAssignments { get; set; }
     }
 }
