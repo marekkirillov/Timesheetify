@@ -1,153 +1,154 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width" />
-  <title>Timesheetify</title>
-  <link rel="icon" type="image/png" href="~/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Timesheetify</title>
+    <link rel="icon" type="image/png" href="~/favicon.ico" />
 
-  @Styles.Render("~/Content/css")
-  @Scripts.Render("~/bundles/modernizr")
-  @Scripts.Render("~/bundles/jquery")
-  @Scripts.Render("~/bundles/bootstrap")
-  @RenderSection("scripts", required: false)
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
 </head>
 <body>
-  <div class="container body-content main-container">
-    <div class="text-center">
-      <h1 id="heading">
-        Timesheetify
-      </h1>
-    </div>
-    @RenderBody()
-
-    <div class="container">
-      <div id="help" class="text-center">
-        <a href="https://www.toggl.com/app/" target="_blank">Toggl</a> |
-        <a href="http://projects.netgroupdigital.com/PWA/Timesheet.aspx" target="_blank">Timesheet</a> |
-        <a href="https://github.com/aare-arnold/timesheetify" target="_blank">Github</a> |
-        <a href="#" data-toggle="modal" data-target="#m3">Documentation and Tips</a>
-      </div>
-
-      <div class="modal fade" id="m3" role="dialog">
-        <div class="modal-dialog">
-          <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Documentation and Tips</h4>
-            </div>
-            <div class="modal-body">
-              <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                <div class="panel panel-default">
-                  <div class="panel-heading" role="tab" id="headingOne">
-                    <h4 class="panel-title">
-                      <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                        Creating workspace to Toggl
-                      </a>
-                    </h4>
-                  </div>
-                  <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                    <div class="panel-body">
-                      <ul>
-                        <li>Sign-in to your Toggl account</li>
-                        <li>Choose Workspaces from menu on the left</li>
-                        <li>Choose create new workspace</li>
-                        <li>Name it to Net Group</li>
-                        <li>Click continue (no need to add additional emails)</li>
-                        <li>Click on Use free version</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="panel panel-default">
-                  <div class="panel-heading" role="tab" id="headingTwo">
-                    <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        Getting your Toggl API token
-                      </a>
-                    </h4>
-                  </div>
-                  <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                    <div class="panel-body">
-                      <ul>
-                        <li>Sign-in to your Toggl account</li>
-                        <li>Choose your name from the bottom left corner</li>
-                        <li>Choose profile settings</li>
-                        <li>Copy and save your API token to the field above</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="panel panel-default">
-                  <div class="panel-heading" role="tab" id="headingFour">
-                    <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                        Actions explained - Timesheet to Toggl
-                      </a>
-                    </h4>
-                  </div>
-                  <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-                    <div class="panel-body">
-                      <ul>
-                        <li>This action synchronizes your assignments and projects from Project Server to Toggl</li>
-                        <li>It creates new projects to Toggl to map them to Project Server projects</li>
-                        <li>It creates tags with specific structure <strong>(PS: Taskname > Parent name)</strong> to Toggl to map them to Project Server assignments</li>
-                        <li>It synchronizes projects (and assignments) where start date is newer than today - 18 months and finish date is newer than today - 30 days or where start and finish date are equal</li>
-                        <li>Ths action should be used at least once a day, preferably at mornings, to get up-to-date tasks and projects to Toggl for time tracking</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="panel panel-default">
-                  <div class="panel-heading" role="tab" id="headingThree">
-                    <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        Actions explained - Toggl to Timesheet
-                      </a>
-                    </h4>
-                  </div>
-                  <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                    <div class="panel-body">
-                      <ul>
-                        <li>This action synchronizes your time trackings from Toggl to Timesheet</li>
-                        <li>To use this functionality you must use predefined (see previous step) projects and tags in Toggl</li>
-                        <li>The descriptions of tasks in Toggl Administrative projects will be transferred to Timesheet's line Comment field</li>
-                        <li>This action should be used at least once a week, preferably on friday evening, because it is highly recommended to fill your timesheet each week</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-
-                <div class="panel panel-default">
-                  <div class="panel-heading" role="tab" id="headingSix">
-                    <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                        Authorization
-                      </a>
-                    </h4>
-                  </div>
-                  <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-                    <div class="panel-body">
-                      <ul>
-                        <li>Your password is used only for making request to Project Server under your domain credentials</li>
-                        <li>Your password wont be stored anywhere</li>
-                        <li>Asp.Net Impersonation will be implemented soon and you dont have to provide your password every time</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-            @*<div class="modal-footer">
-                <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Close</button>
-              </div>*@
-          </div>
+    <div class="container body-content main-container">
+        <div class="text-center">
+            <h1 id="heading">
+                Timesheetify
+            </h1>
         </div>
-      </div>
+        @RenderBody()
+
+        <div class="container">
+            <div id="help" class="text-center">
+                <a href="https://www.toggl.com/app/" target="_blank">Toggl</a> |
+                <a href="http://projects.netgroupdigital.com/PWA/Timesheet.aspx" target="_blank">Timesheet</a> |
+                <a href="https://github.com/aare-arnold/timesheetify" target="_blank">Github</a> |
+                <a href="#" data-toggle="modal" data-target="#m3">Documentation and Tips</a>
+            </div>
+
+            <div class="modal fade" id="m3" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Documentation and Tips</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingOne">
+                                        <h4 class="panel-title">
+                                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                                Creating workspace to Toggl
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                        <div class="panel-body">
+                                            <ul>
+                                                <li>Sign-in to your Toggl account</li>
+                                                <li>Choose Workspaces from menu on the left</li>
+                                                <li>Choose create new workspace</li>
+                                                <li>Name it to Net Group</li>
+                                                <li>Click continue (no need to add additional emails)</li>
+                                                <li>Click on Use free version</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingTwo">
+                                        <h4 class="panel-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                Getting your Toggl API token
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                        <div class="panel-body">
+                                            <ul>
+                                                <li>Sign-in to your Toggl account</li>
+                                                <li>Choose your name from the bottom left corner</li>
+                                                <li>Choose profile settings</li>
+                                                <li>Copy and save your API token to the field above</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingFour">
+                                        <h4 class="panel-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                                Actions explained - Timesheet to Toggl
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+                                        <div class="panel-body">
+                                            <ul>
+                                                <li>This action synchronizes your assignments and projects from Project Server to Toggl</li>
+                                                <li>It creates new projects to Toggl to map them to Project Server projects</li>
+                                                <li>It creates tags with specific structure <strong>(PS: Taskname > Project name)</strong> to Toggl to map them to Project Server assignments</li>
+                                                <li>Ths action should be used at least once a day, preferably at mornings, to get up-to-date tasks and projects to Toggl for time tracking</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingThree">
+                                        <h4 class="panel-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                Actions explained - Toggl to Timesheet
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                        <div class="panel-body">
+                                            <ul>
+                                                <li>This action synchronizes your time trackings from Toggl to Timesheet</li>
+                                                <li>To use this functionality you must use predefined (see previous step) projects and tags in Toggl</li>
+                                                <li>The descriptions of tasks in Toggl Administrative projects will be transferred to Timesheet's line Comment field</li>
+                                                <li>This action should be used at least once a week, preferably on friday evening, because it is highly recommended to fill your timesheet each week</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingSix">
+                                        <h4 class="panel-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                                Notes to Project Managers
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+                                        <div class="panel-body">
+                                            <ul>
+                                                <li>All subtasks per project should have <strong>unique names</strong>. 
+                                                    <p>For example use <br />
+                                                        &emsp;Project > Iteration 1 > Iteration 1 Development<br />
+                                                        &emsp;Project > Iteration 2 > Iteration 2 Development<br/>
+                                                        Instead of <br/>
+                                                        &emsp;Project > Iteration 1 > Development<br />
+                                                        &emsp;Project > Iteration 2 > Development<br/>
+                                                        </p>Otherwise sync will always be applied to newest subtask</li>
+                                                <li>Timesheetify will synchronizes assignments (and projects they belong to) where start date is newer than <strong>today - 18 months</strong> and finish date is newer than <strong>today - 30 days</strong> or where start and finish date are equal</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </body>
 </html>
