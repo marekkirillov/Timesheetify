@@ -1,5 +1,4 @@
-﻿@using Timesheetify.Extensions
-@model Timesheetify.Models.Model
+﻿@model Timesheetify.Models.Model
 
 @if (!string.IsNullOrEmpty(Model.Error))
 {
@@ -12,10 +11,10 @@ else if (Model.ShowSuccess)
     </div>
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Save", "Home"))
 {
     <div class="main-form-container">
-        <div class="main-form" id="main-form">
+        <div class="main-form">
             <div class="front">
                 <h2 class="text-center">Synchronize</h2>
                 <div class="form-group">
@@ -25,25 +24,12 @@ else if (Model.ShowSuccess)
 
                 <div class="form-group">
                     <label class="control-label">Toggl API token</label>
-                    <div class="form-group">
+                    <div class="input-group">
                         @Html.TextBoxFor(m => m.ApiKey, new { @class = "form-control", id = "togglKey" })
+                        <span class="input-group-btn">
+                            <input type="submit" class="btn btn-primary" value="Save" />
+                        </span>
                     </div>
-                </div>
-
-                @if (Model.ApiKey != null)
-                {
-                    <div class="form-group">
-                        <label class="control-label">Workspaces</label>
-                        <div class="form-group">
-                            @Html.DropDownListFor(m => m.WorkspaceId, Model.Workspace, new { @class = "form-control" })
-                        </div>
-                    </div>
-}
-
-                <div class="form-group">
-                    <span>
-                        <input type="submit" class="btn btn-primary form-control" style="border-radius: 4px;" formaction="@Url.Action("Save", "Home")" value="Save" />
-                    </span>
                 </div>
 
                 <div id="main-form-actions">
@@ -71,50 +57,75 @@ else if (Model.ShowSuccess)
             </div>
         </div>
     </div>
+}
 
-  <!-- Modal -->
-    <div class="modal fade" id="m1" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header modal-border-none">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body modal-custom-body">
-                    <h4>Are you sure you want to update?</h4>
-                </div>
-                <div class="modal-footer modal-border-none modal-custom-footer">
-                    <input type="submit" class="btn btn-secondary btn-modal-both" data-dismiss="modal" value="Cancel" />
-                    <input type="submit" class="btn btn-primary btn-modal-both" formaction="@Url.Action("UpdateTimesheet", "Home")" value="Confirm" />
-                </div>
+
+<!-- Modal -->
+<div class="modal fade" id="m1" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Request authentication</h4>
             </div>
-        </div>
-    </div>
+            @using (Html.BeginForm("UpdateTimesheet", "Home"))
+            { <div class="modal-body">
 
-    <div class="modal fade" id="m2" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header modal-border-none">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body modal-custom-body">
-                    <h4>Are you sure you want to update?</h4>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Week to sync</label>
+                <div class="form-horizontal">
                     <div class="form-group">
-                        @Html.DropDownListFor(m => m.SelectedWeek, Model.Weeks, new { @class = "form-control" })
+                        <label class="col-sm-3 control-label">User</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Week to sync</label>
+                        <div class="col-sm-9">
+                            @Html.DropDownListFor(m => m.SelectedWeek, Model.Weeks, new { @class = "form-control" })
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer modal-border-none modal-custom-footer">
-                    <input type="submit" class="btn btn-secondary btn-modal-both" data-dismiss="modal" value="Cancel" />
-                    <input type="submit" class="btn btn-primary btn-modal-both" formaction="@Url.Action("UpdateToggl", "Home")" value="Confirm" />
-                </div>
             </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
+            </div>}
         </div>
     </div>
-}
+</div>
+
+<div class="modal fade" id="m2" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Request authentication</h4>
+            </div>
+            @using (Html.BeginForm("UpdateToggl", "Home"))
+            { <div class="modal-body">
+
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">User</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <label class="col-sm-3 control-label">Remove old tags</label>
+                            <div class="col-sm-9">
+                                @Html.CheckBoxFor(m => m.ToggleCleanup, new { @class = "form-control" })
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
+            </div>}
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     $(function () {
@@ -127,12 +138,5 @@ else if (Model.ShowSuccess)
 
             $("input, button.action").prop("disabled", "disabled");
         });
-    });
-
-    $(document).ready(function () {
-        var input = $('#togglKey').val();
-        if (jQuery.trim(input).length > 0) {
-            $('.main-form').css("height", "650px");
-        }
     });
 </script>

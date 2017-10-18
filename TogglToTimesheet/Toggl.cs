@@ -97,25 +97,6 @@
 			return workspace;
 		}
 
-		public void ValidateApiKey(IList<SelectListItem> list, string apikey, string workspaceName)
-		{
-			if (apikey.Length != 32)
-				throw new Exception("API token length has to be 32 characters!");
-
-			try
-			{
-				GetAllToggleWorkspaces(workspaceName);
-			}
-			catch (Exception e)
-			{
-				if (e.InnerException != null && e.InnerException.ToString().Contains(HttpStatusCode.Forbidden.ToString()))
-				{
-					throw new Exception("Error validating API token!");
-				}
-				throw new Exception("Error validating API token:" + e.Message);
-			}
-		}
-
 		private ProjectsResult AddOrUpdateProjects(List<string> dataProjects, string wid, bool cleanup)
 		{
 			var projects = TogglGet<TogglProject[]>(TogglWorkspaceItemsUrl, wid, "projects")?.ToList() ?? new List<TogglProject>();
