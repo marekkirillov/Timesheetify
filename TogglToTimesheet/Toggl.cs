@@ -10,7 +10,6 @@
 	using System.Net.Http.Headers;
 	using System.Text;
 	using System.Web;
-	using System.Web.Mvc;
 	using DTO;
 	using Newtonsoft.Json;
 
@@ -70,24 +69,6 @@
 				throw new Exception("Could not find workspace 'Net Group' from Toggl");
 
 			return new TimesheetToTogglResult(AddOrUpdateProjects(data.Projects, workspace.id, cleanup), AddOrUpdateTags(data.Tags, workspace.id, cleanup));
-		}
-
-		public IList<SelectListItem> GetAllToggleWorkspaces(string workspaceId)
-		{
-			var workspaces = TogglGet<TogglWorkspace[]>(TogglWorkspacesUrl).ToList();
-			var list = new List<SelectListItem>();
-
-			foreach (var item in workspaces)
-			{
-				list.Add(new SelectListItem
-				{
-					Value = item.id,
-					Text = item.name,
-					Selected = item.id == workspaceId
-				});
-			}
-
-			return list;
 		}
 
 		private TogglWorkspace GetTogglWorkspace()

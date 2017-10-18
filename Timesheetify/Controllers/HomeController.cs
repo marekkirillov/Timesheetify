@@ -67,58 +67,20 @@ namespace Timesheetify.Controllers
                 model.Error = ErrorMsg;
                 model.Success = SuccessMsg;
                 model.Weeks = GetListOfPreviousMondays();
-
-	            if (model.ApiKey != null)
-	            {
-		            model.Workspace = GetListOfWorkspaces(context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name))?.TogglApiKey, context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name))?.WorkspaceName);
-	            }
-			}
+            }
 
             return View(model);
         }
 
-	    private static IList<SelectListItem> GetListOfWorkspaces(string apiKey, string workspaceId)
-	    {
-		    return new Toggl(apiKey).GetAllToggleWorkspaces(workspaceId);
-	    }
+        public ActionResult Save(Model model)
+        {
+            SaveKey(model);
 
+            Redirected = true;
+            return RedirectToAction("Index");
+        }
 
-	    public ActionResult Save(Model model)
-	    {
-		    try
-		    {
-			    SaveKey(model);
-		    }
-		    catch (Exception e)
-		    {
-			    Error = e.Message;
-		    }
-
-		    Redirected = true;
-		    return RedirectToAction("Index");
-	    }
-
-	    private void SaveKey(Model model)
-	    {
-		    using (var context = new TimesheetifyEntities())
-		    {
-			    var worker = context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name)) ?? new Worker
-			    {
-				    Identity = User.Identity.Name
-			    };
-
-			    new Toggl(model.ApiKey).ValidateApiKey(model.Workspace, model.ApiKey, context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name))?.WorkspaceName);
-
-			    worker.TogglApiKey = model.ApiKey;
-			    worker.WorkspaceName = model.WorkspaceId;
-			    context.Workers.AddOrUpdate(worker);
-			    context.SaveChanges();
-
-			    LogRequest(Action.APIKeySave, "OK");
-		    }
-	    }
-
-		[HttpPost]
+        [HttpPost]
         public ActionResult UpdateTimesheet(Model model)
         {
             if (model.SelectedWeek.HasValue && GetListOfPrevousMondays().Contains(model.SelectedWeek.Value))
@@ -229,6 +191,23 @@ namespace Timesheetify.Controllers
             var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name} - {(action == Action.TimesheetToToggl ? "Timesheet -> Toggl" : action == Action.TogglToTimesheet ? "Toggl -> Timesheet" : "Toggl API key saved")} - with message:{success}";
 
             System.IO.File.AppendAllText(path, msg);
+        }
+
+        private void SaveKey(Model model)
+        {
+            using (var context = new TimesheetifyEntities())
+            {
+                var worker = context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name)) ?? new Worker
+                {
+                    Identity = User.Identity.Name
+                };
+
+                worker.TogglApiKey = model.ApiKey;
+                context.Workers.AddOrUpdate(worker);
+                context.SaveChanges();
+
+                LogRequest(Action.APIKeySave, "OK");
+            }
         }
 
         private static IList<SelectListItem> GetListOfPreviousMondays()
