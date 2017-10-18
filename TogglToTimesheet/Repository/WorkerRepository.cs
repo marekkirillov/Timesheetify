@@ -27,12 +27,12 @@
         {
             using (var context = new TimesheetifyEntities())
             {
-                //Take all worker assignments, 
-                //group by tag (incase there are more than one subtask per project with same name), 
-                //take the newest subtask (newest end date of assignment),
-                //save or update GUIDs by tag so that tags refer always to newest assignments
+				//Take all worker assignments, 
+				//group by tag (incase there are more than one subtask per project with same name), 
+				//take the latest subtask (latest end date of assignment),
+				//save or update GUIDs by tag so that tags refer always to newest assignments
 
-                var workerAssignments = context.WorkerAssignments.Where(wa => wa.WorkerId == worker.Id);
+				var workerAssignments = context.WorkerAssignments.Where(wa => wa.WorkerId == worker.Id);
                 var assignmentsGrouped = assignments.GroupBy(a => a.Tag);
                 var assignmentsDistincted = assignmentsGrouped.Select(g => g.OrderByDescending(a => a.End).First());
 

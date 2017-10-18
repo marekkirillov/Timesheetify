@@ -40,26 +40,38 @@
 						continue;
 
 					var line = timesheetRows.FirstOrDefault(l => l.TASK_UID.Equals(workerAssignment.TaskGuid));
+					var first = timesheetEntryGroup.First();
 
 					if (line == null)
 					{
 						line = timesheet.Lines.NewLinesRow();
 
-						line.TS_LINE_CLASS_UID = GetLineClass(timesheetEntryGroup.First());
-						line.PROJ_UID = workerAssignment.ProjectGuid;
-						line.ASSN_UID = workerAssignment.AssignmentGuid;
 						line.TASK_UID = workerAssignment.TaskGuid;
-						line.TS_LINE_CACHED_ASSIGN_NAME = timesheetEntryGroup.First().Task;
-						line.TS_LINE_CACHED_PROJ_NAME = timesheetEntryGroup.First().Project;
+						line.TS_LINE_CLASS_UID = GetLineClass(first);
+						line.TS_LINE_CACHED_ASSIGN_NAME = first.Task;
+						line.TS_LINE_CACHED_PROJ_NAME = first.Project;
 						line.TS_LINE_UID = Guid.NewGuid();
 						line.TS_UID = TS_UID;
-						line.TS_LINE_STATUS = (byte)TimesheetEnum.LineStatus.NotApplicable;
-						line.TS_LINE_VALIDATION_TYPE = (byte)TimesheetEnum.ValidationType.Unverified;
+						line.TS_LINE_ACT_SUM_VALUE = 0.0M;
+
+						if (first.IsAdministrative)
+						{
+							line.TS_LINE_STATUS = (byte)TimesheetEnum.LineStatus.NotApplicable;
+							line.TS_LINE_VALIDATION_TYPE = (byte)TimesheetEnum.ValidationType.Unverified;
+						}
+						else
+						{
+							line.PROJ_UID = workerAssignment.ProjectGuid;
+							line.ASSN_UID = workerAssignment.AssignmentGuid;
+
+							line.TS_LINE_STATUS = (byte)TimesheetEnum.LineStatus.Approved;
+							line.TS_LINE_VALIDATION_TYPE = (byte)TimesheetEnum.ValidationType.Verified;
+						}
 
 						timesheet.Lines.AddLinesRow(line);
 					}
 
-					line.TS_LINE_COMMENT = timesheetEntryGroup.First().IsAdministrative
+					line.TS_LINE_COMMENT = first.IsAdministrative
 						? string.Join(", ", timesheetEntryGroup.Select(t => t.Comment).Distinct())
 						: string.Empty;
 
@@ -69,10 +81,9 @@
 					{
 						var actualWorkTsActStartDate = timesheetEntry.Start.Date;
 						var actualWork = timesheet.Actuals.FindByTS_LINE_UIDTS_ACT_START_DATE(line.TS_LINE_UID, actualWorkTsActStartDate);
+
 						if (actualWork != null)
-						{
 							actualWork.TS_ACT_VALUE = timesheetEntry.Duration * 60 * 1000;
-						}
 						else
 						{
 							actualWork = timesheet.Actuals.NewActualsRow();
@@ -84,9 +95,6 @@
 						}
 					}
 				}
-
-				//TODO: Test new lines (Marek Kirillov, 06.10.2017 00:00)
-
 
 				context.Client.QueueUpdateTimesheet(Guid.NewGuid(), TS_UID, timesheet);
 			}
@@ -127,7 +135,7 @@
 		private static TimesheetDataSet GetTimesheet(ImpersonationContext<TimeSheetClient, TimeSheet> context, TimePeriodDataSet.TimePeriodsRow timesheetPeriod, out Guid TS_UID)
 		{
 			var timesheet = context.Client.ReadTimesheetByPeriod(context.UserUid, timesheetPeriod.WPRD_UID, Navigation.Current);
-
+			TS_UID = Guid.Empty;
 			if (timesheet == null)
 			{
 				var timesheetDs = new TimesheetDataSet();
@@ -146,8 +154,9 @@
 				TS_UID = headersRow.TS_UID;
 			}
 			else
-				TS_UID = timesheet.Lines[0].TS_UID;
-
+			{
+				TS_UID = timesheet.Headers[0].TS_UID;
+			}
 			return timesheet;
 		}
 
