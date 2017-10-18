@@ -21,9 +21,7 @@ namespace Timesheetify.Models
 
         public string Success { get; set; }
 
-	    public IList<SelectListItem> Workspace { get; set; }
-	    public string WorkspaceId { get; set; }
-		public IList<SelectListItem> Weeks { get; set; }
+        public IList<SelectListItem> Weeks { get; set; }
         public DateTime? SelectedWeek { get; set; }
    }
 }
