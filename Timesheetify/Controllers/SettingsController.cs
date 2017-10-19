@@ -4,9 +4,11 @@ namespace Timesheetify.Controllers
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Data.Entity.Migrations;
 	using System.Linq;
 	using Models;
 	using TogglToTimesheet;
+	using TogglToTimesheet.Data;
 
 	public class SettingsController : BaseController
 	{
@@ -26,10 +28,15 @@ namespace Timesheetify.Controllers
 		{
 			try
 			{
-				var worker = CurrentWorker;
-				worker.Cleanup = model.Cleanup;
-				worker.WorkspaceName = model.WorkspaceId;
-				worker.SaveChanges();
+				using (var context = new TimesheetifyEntities())
+				{
+					var worker = context.Workers.First(f => f.Identity.Equals(User.Identity.Name));
+					worker.Cleanup = model.Cleanup;
+					worker.WorkspaceName = model.WorkspaceId;
+					context.Workers.AddOrUpdate(worker);
+					context.SaveChanges();
+				}
+			
 				LogRequest(Action.SaveSettings, "OK");
 
 			}

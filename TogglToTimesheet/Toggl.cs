@@ -103,7 +103,7 @@
 					TogglPut($"{TogglProjectUrl}/{project.id}", project);
 				}
 				else
-					TogglPost<TogglProject, object>(TogglProjectUrl, new { project = new TogglProject { name = name, wid = wid } });
+					TogglPost<TogglProject, object>(TogglProjectUrl, new { project = new TogglProject { active = true, name = name, wid = wid } });
 
 				i++;
 			}

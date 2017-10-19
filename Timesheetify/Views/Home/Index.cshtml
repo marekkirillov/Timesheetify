@@ -127,6 +127,7 @@ else if (Model.ShowSuccess)
             }, 1000);
 
             $("input, button.action").prop("disabled", "disabled");
+            $(".alert").remove();
         });
 
         $("input[type='checkbox']").bootstrapSwitch();

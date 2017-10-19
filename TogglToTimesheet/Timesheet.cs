@@ -19,6 +19,20 @@
 	{
 		private static Dictionary<string, Guid> _lineClasses;
 
+		public static bool IsTimesheetOpen(DateTime startDate)
+		{
+			var timesheetPeriod = GetTimesheetPeriod(startDate);
+			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(Timesheetify.CurrentAccountName))
+			{
+				var timesheet = context.Client.ReadTimesheetByPeriod(context.UserUid, timesheetPeriod.WPRD_UID, Navigation.Current);
+				if (timesheet == null)
+					return true;
+
+				var status = timesheet.Headers[0].TS_STATUS_ENUM;
+				return status == (byte) TimesheetEnum.Status.InProgress || status == (byte) TimesheetEnum.Status.Rejected;
+			}
+		}
+
 		internal static void FillWeek(TimesheetEntry[] timesheetEntries, DateTime? startDate = null)
 		{
 			LoadLineClasses();
@@ -185,8 +199,7 @@
 
 		internal static List<ResourceAssignment> GenerateTogglData(string accountName)
 		{
-			var startCriteria = DateTime.Now.AddMonths(-18);
-			var endCriteria = DateTime.Now.AddDays(-30);
+			var startCriteria = DateTime.Now.AddMonths(-13);
 			var assignments = new List<ResourceAssignment>();
 
 			using (var context = new ImpersonationContext<ResourceClient, Resource>(accountName))
@@ -222,7 +235,7 @@
 					var start = (DateTime)row["ASSN_START_DATE"];
 					var end = (DateTime)row["ASSN_FINISH_DATE"];
 
-					if (start > startCriteria && end > endCriteria || start == end)
+					if (start > startCriteria || start == end)
 					{
 						var projectName = row["PROJ_NAME"].ToString();
 

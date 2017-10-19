@@ -42,7 +42,7 @@
                                            new WorkerAssignment
                                            {
                                                Tag = resourceAssignment.Tag,
-                                               Worker = worker
+                                               WorkerId = worker.Id
                                            };
 
                     workerAssignment.AssignmentGuid = resourceAssignment.AssignmentUid;
