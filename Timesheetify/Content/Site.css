@@ -38,7 +38,7 @@ h1#heading {
 .main-form .front:before {
     position: absolute;
     display: block;
-    content: 'beeta';
+    content: 'V2.0';
     text-align: center;
     width: 130px;
     height: 30px;

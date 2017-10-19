@@ -10,69 +10,31 @@ namespace Timesheetify.Controllers
     using Models;
     using TogglToTimesheet;
     using System.Web.Http;
-    using System.Web.Services.Protocols;
-    using Microsoft.Office.Project.Server.Library;
-    using TogglToTimesheet.Active_Directory;
     using TogglToTimesheet.Data;
     using TogglToTimesheet.DTO;
-    using User = NG.Timesheetify.Common.Active_Directory.User;
 
-    [System.Web.Mvc.Authorize]
-    public class HomeController : Controller
+	[System.Web.Mvc.Authorize]
+    public class HomeController : BaseController
     {
-
-        #region Tempdata
-
-        public bool Redirected
-        {
-            get
-            {
-                var obj = TempData["redirected"];
-                return obj != null && bool.Parse(obj.ToString());
-            }
-            set { TempData["redirected"] = value; }
-        }
-
-        public string ErrorMsg
-        {
-            get
-            {
-                var obj = TempData["error"];
-                return obj?.ToString();
-            }
-            set { TempData["error"] = value; }
-        }
-
-        public string SuccessMsg
-        {
-            get
-            {
-                var obj = TempData["success"];
-                return obj?.ToString();
-            }
-            set { TempData["success"] = value; }
-        }
-
-        #endregion
-
         public ActionResult Index()
         {
-            var model = new Model();
+	        Timesheetify.CurrentAccountName = User.Identity.Name;
 
-            using (var context = new TimesheetifyEntities())
-            {
-                model.Name = User.Identity.Name;
-                model.ApiKey = context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name))?.TogglApiKey;
-                model.ShowSuccess = Redirected;
-                model.Error = ErrorMsg;
-                model.Success = SuccessMsg;
-                model.Weeks = GetListOfPreviousMondays();
-            }
+	        var model = new Model
+	        {
+		        Name = User.Identity.Name,
+		        ApiKey = CurrentWorker?.TogglApiKey,
+		        ShowSuccess = Redirected,
+		        Error = ErrorMsg,
+		        Success = SuccessMsg,
+		        Weeks = GetListOfPreviousMondays()
+	        };
 
-            return View(model);
+
+	        return View(model);
         }
 
-        public ActionResult Save(Model model)
+		public ActionResult Save(Model model)
         {
             SaveKey(model);
 
@@ -93,7 +55,6 @@ namespace Timesheetify.Controllers
                 }
                 catch (Exception e)
                 {
-                    var ww = new PSClientError(e as SoapException);
                     ErrorMsg = e.Message + Environment.NewLine + e.InnerException;
                     LogError(e);
                 }
@@ -124,7 +85,7 @@ namespace Timesheetify.Controllers
             return RedirectToAction("Index");
         }
 
-        private string GetResultMessage(TimesheetToTogglResult result)
+        private static string GetResultMessage(TimesheetToTogglResult result)
         {
             var message = "";
 
@@ -147,51 +108,7 @@ namespace Timesheetify.Controllers
             return message;
         }
 
-        public string GetApiKey()
-        {
-            using (var context = new TimesheetifyEntities())
-                return context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name))?.TogglApiKey;
-        }
 
-        private User GetUser(string password)
-        {
-            var user = AdUserProvider.GetUserByIdentityName(User.Identity.Name);
-            user.Password = password;
-            return user;
-        }
-
-        public void LogError(Exception e)
-        {
-            var path = GetPath();
-            var error = $"{Environment.NewLine}ERROR - {DateTime.Now} - {User.Identity.Name} - {e.Message}";
-            var stacktrace = $"{Environment.NewLine}{e.StackTrace}";
-
-            if (e.InnerException != null)
-            {
-                error += $"- ({e.InnerException.Message})";
-                stacktrace += $"{Environment.NewLine}{e.InnerException.StackTrace}";
-            }
-
-            System.IO.File.AppendAllText(path, error);
-            System.IO.File.AppendAllText(path, stacktrace);
-        }
-
-        private string GetPath()
-        {
-            var path = "C:\\Logs\\Timesheetify";
-
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            return Path.Combine(path, "Log.txt");
-        }
-
-        public void LogRequest(Action action, string success)
-        {
-            var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name} - {(action == Action.TimesheetToToggl ? "Timesheet -> Toggl" : action == Action.TogglToTimesheet ? "Toggl -> Timesheet" : "Toggl API key saved")} - with message:{success}";
-
-            System.IO.File.AppendAllText(path, msg);
-        }
 
         private void SaveKey(Model model)
         {
@@ -202,7 +119,9 @@ namespace Timesheetify.Controllers
                     Identity = User.Identity.Name
                 };
 
-                worker.TogglApiKey = model.ApiKey;
+	            new Toggl(model.ApiKey, worker.WorkspaceName).ValidateApiKey(model.ApiKey);
+
+				worker.TogglApiKey = model.ApiKey;
                 context.Workers.AddOrUpdate(worker);
                 context.SaveChanges();
 
@@ -246,11 +165,6 @@ namespace Timesheetify.Controllers
         }
 
 
-        public enum Action
-        {
-            TogglToTimesheet = 1,
-            TimesheetToToggl = 2,
-            APIKeySave = 3
-        }
+
     }
 }

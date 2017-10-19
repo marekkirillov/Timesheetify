@@ -183,6 +183,7 @@
     <Compile Include="Data\WorkerAssignment.cs">
       <DependentUpon>Worker.tt</DependentUpon>
     </Compile>
+    <Compile Include="Domain\Worker.cs" />
     <Compile Include="DTO\ResourceAssignment.cs" />
     <Compile Include="DTO\TimesheetToTogglResult.cs" />
     <Compile Include="DTO\TogglEntry.cs" />

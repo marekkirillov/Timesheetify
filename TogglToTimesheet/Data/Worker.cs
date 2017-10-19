@@ -24,6 +24,7 @@ namespace TogglToTimesheet.Data
         public string Identity { get; set; }
         public string TogglApiKey { get; set; }
         public string WorkspaceName { get; set; }
+        public bool Cleanup { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<WorkerAssignment> WorkerAssignments { get; set; }

@@ -13,6 +13,7 @@
           <Property Name="Identity" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="TogglApiKey" Type="nvarchar" MaxLength="200" />
           <Property Name="WorkspaceName" Type="nvarchar" MaxLength="200" />
+          <Property Name="Cleanup" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="WorkerAssignment">
           <Key>
@@ -58,6 +59,7 @@
           <Property Name="TogglApiKey" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="WorkspaceName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="WorkerAssignments" Relationship="TimesheetifyModel.FK_WorkerAssignment_Worker" FromRole="Worker" ToRole="WorkerAssignment" />
+          <Property Name="Cleanup" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityContainer Name="TimesheetifyEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Workers" EntityType="Self.Worker" />
@@ -100,6 +102,7 @@
           <EntitySetMapping Name="Workers">
             <EntityTypeMapping TypeName="TimesheetifyModel.Worker">
               <MappingFragment StoreEntitySet="Worker">
+                <ScalarProperty Name="Cleanup" ColumnName="Cleanup" />
                 <ScalarProperty Name="WorkspaceName" ColumnName="WorkspaceName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Identity" ColumnName="Identity" />

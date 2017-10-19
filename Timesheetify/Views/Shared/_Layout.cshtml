@@ -40,6 +40,25 @@
                         <div class="modal-body">
                             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                 <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="headingTwo">
+                                        <h4 class="panel-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                Getting your Toggl API token
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                        <div class="panel-body">
+                                            <ul>
+                                                <li>Sign-in to your Toggl account</li>
+                                                <li>Choose your name from the bottom left corner</li>
+                                                <li>Choose profile settings</li>
+                                                <li>Copy and save your API token to the field above</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
                                     <div class="panel-heading" role="tab" id="headingOne">
                                         <h4 class="panel-title">
                                             <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
@@ -61,24 +80,25 @@
                                     </div>
                                 </div>
                                 <div class="panel panel-default">
-                                    <div class="panel-heading" role="tab" id="headingTwo">
+                                    <div class="panel-heading" role="tab" id="heading6">
                                         <h4 class="panel-title">
-                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                Getting your Toggl API token
+                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                                                Advanced settings
                                             </a>
                                         </h4>
                                     </div>
-                                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                    <div id="collapse6" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading6">
                                         <div class="panel-body">
                                             <ul>
-                                                <li>Sign-in to your Toggl account</li>
-                                                <li>Choose your name from the bottom left corner</li>
-                                                <li>Choose profile settings</li>
-                                                <li>Copy and save your API token to the field above</li>
+                                                <li>Advanced settings will only be available if Toggl API key is present</li>
+                                                <li>Cleanup - While syncing data from Timesheet to Toggl, cleanup will determine if old tags from toggl should be deleted</li>
+                                                <li>Toggl workspace - Determines the Toggl workspace to use to sync data from Toggl to Timesheed and vice versa</li>
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
+                               
+                                
                                 <div class="panel panel-default">
                                     <div class="panel-heading" role="tab" id="headingFour">
                                         <h4 class="panel-title">

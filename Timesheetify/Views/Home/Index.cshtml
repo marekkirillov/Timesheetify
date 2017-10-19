@@ -1,4 +1,5 @@
-﻿@model Timesheetify.Models.Model
+﻿@using Microsoft.Ajax.Utilities
+@model Timesheetify.Models.Model
 
 @if (!string.IsNullOrEmpty(Model.Error))
 {
@@ -31,6 +32,12 @@ else if (Model.ShowSuccess)
                         </span>
                     </div>
                 </div>
+
+                @if (!Model.ApiKey.IsNullOrWhiteSpace())
+                {
+                    <div class="form-group">
+                        <a href="#" data-toggle="modal" class="pull-right" data-target="#m4">Advanced settings</a>
+                    </div>}
 
                 <div id="main-form-actions">
                     <button class="btn action" data-toggle="modal" data-target="#m2" id="timesheet-to-toggl">
@@ -81,11 +88,11 @@ else if (Model.ShowSuccess)
                     </div>
                 </div>
             </div>
-                <div class="modal-footer">
-                    <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                    
-                    <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
-                </div>}
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+
+                <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
+            </div>}
         </div>
     </div>
 </div>
@@ -99,14 +106,16 @@ else if (Model.ShowSuccess)
                 <h4 class="modal-title">Are you sure?</h4>
             </div>
             @using (Html.BeginForm("UpdateToggl", "Home"))
-            { 
-            <div class="modal-footer">
-                <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
-            </div>}
+            {
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary submit" data-dismiss="modal">Confirm</button>
+                </div>}
         </div>
     </div>
 </div>
+
+@{ Html.RenderAction("Index", "Settings"); }
 
 <script type="text/javascript">
     $(function () {
@@ -119,5 +128,7 @@ else if (Model.ShowSuccess)
 
             $("input, button.action").prop("disabled", "disabled");
         });
+
+        $("input[type='checkbox']").bootstrapSwitch();
     });
 </script>

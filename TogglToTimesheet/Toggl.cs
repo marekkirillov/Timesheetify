@@ -21,12 +21,14 @@
 		private const string TogglWorkspacesUrl = TogglUrl + "workspaces";
 		private const string TogglTagsUrl = TogglUrl + "tags";
 		private const string TogglProjectUrl = TogglUrl + "projects";
-		private const string Workspace = "Net Group";
+		private const string DefaultWorkspace = "Net Group";
+		private static string _workspaceId;
 
 		private readonly HttpClient _httpClient;
 
-		public Toggl(string apiKey)
+		public Toggl(string apiKey, string workspaceId)
 		{
+			_workspaceId = workspaceId;
 			var togglApiPwd = apiKey + ":api_token";
 			var togglPwdB64 = Convert.ToBase64String(Encoding.Default.GetBytes(togglApiPwd.Trim()));
 			var toggleAuthHeader = "Basic " + togglPwdB64;
@@ -41,9 +43,9 @@
 		{
 			DateTime endDate;
 
-			var workspace = GetTogglWorkspace();
+			var togglWorkspaceId = GetTogglWorkspaceId();
 
-			if (workspace == null)
+			if (togglWorkspaceId == null)
 				throw new Exception("Could not find workspace 'Net Group' from Toggl");
 
 			if (startDate == null)
@@ -57,25 +59,28 @@
 				endDate = startDate.Value.AddDays(6);
 			}
 
-			var togglEntries = GetEntries(startDate.Value, endDate)?.Where(e => e.wid.Equals(workspace.id) && e.tags != null && e.tags.Any()).ToArray();
-			return AddProjectNames(togglEntries, workspace.id);
+			var togglEntries = GetEntries(startDate.Value, endDate)?.Where(e => e.wid.Equals(togglWorkspaceId) && e.tags != null && e.tags.Any()).ToArray();
+			return AddProjectNames(togglEntries, togglWorkspaceId);
 		}
 
 		public TimesheetToTogglResult SyncProjectsAndTags(TogglProjectsAndTags data, bool cleanup)
 		{
-			var workspace = GetTogglWorkspace();
+			var togglWorkspaceId = GetTogglWorkspaceId();
 
-			if (workspace == null)
+			if (togglWorkspaceId == null)
 				throw new Exception("Could not find workspace 'Net Group' from Toggl");
 
-			return new TimesheetToTogglResult(AddOrUpdateProjects(data.Projects, workspace.id, cleanup), AddOrUpdateTags(data.Tags, workspace.id, cleanup));
+			return new TimesheetToTogglResult(AddOrUpdateProjects(data.Projects, togglWorkspaceId, cleanup), AddOrUpdateTags(data.Tags, togglWorkspaceId, cleanup));
 		}
 
-		private TogglWorkspace GetTogglWorkspace()
+		private string GetTogglWorkspaceId()
 		{
+			if (!string.IsNullOrWhiteSpace(_workspaceId))
+				return _workspaceId;
+
 			var workspaces = TogglGet<TogglWorkspace[]>(TogglWorkspacesUrl);
-			var workspace = workspaces.FirstOrDefault(w => w.name == Workspace);
-			return workspace;
+			var workspace = workspaces.FirstOrDefault(w => w.name == DefaultWorkspace);
+			return workspace?.id;
 		}
 
 		private ProjectsResult AddOrUpdateProjects(List<string> dataProjects, string wid, bool cleanup)
@@ -116,6 +121,30 @@
 			}
 
 			return new ProjectsResult(i, j);
+		}
+
+		public void ValidateApiKey(string apikey)
+		{
+			if (apikey.Length != 32)
+				throw new Exception("API token length has to be 32 characters!");
+
+			try
+			{
+				GetAllToggleWorkspaces();
+			}
+			catch (Exception e)
+			{
+				if (e.InnerException != null && e.InnerException.ToString().Contains(HttpStatusCode.Forbidden.ToString()))
+				{
+					throw new Exception("Error validating API token!");
+				}
+				throw new Exception("Error validating API token:" + e.Message);
+			}
+		}
+
+		public IList<TogglWorkspace> GetAllToggleWorkspaces()
+		{
+			return TogglGet<TogglWorkspace[]>(TogglWorkspacesUrl).ToList();
 		}
 
 		private TagsResult AddOrUpdateTags(List<string> dataTags, string wid, bool cleanup)
