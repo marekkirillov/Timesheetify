@@ -125,9 +125,6 @@
 
 		public void ValidateApiKey(string apikey)
 		{
-			if (apikey.Length != 32)
-				throw new Exception("API token length has to be 32 characters!");
-
 			try
 			{
 				GetAllToggleWorkspaces();

@@ -83,6 +83,11 @@ namespace Timesheetify.Controllers
 			System.IO.File.AppendAllText(path, stacktrace);
 		}
 
+		protected static bool ApiIsValid(string key)
+		{
+			return key != null && key.Length == 32;
+		}
+
 		private static string GetPath()
 		{
 			const string path = "C:\\Logs\\Timesheetify";

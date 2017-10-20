@@ -10,10 +10,8 @@
 	{
 		public static string CurrentAccountName;
 
-		public static TogglToTimesheetResult UpdateTimesheet(string accountName, DateTime? startDate = null)
+		public static TogglToTimesheetResult UpdateTimesheet(DateTime? startDate = null)
 		{
-			CurrentAccountName = accountName;
-
 			var worker = WorkerRepository.GetCurrentWorker();
 
 			CheckAPIKey(worker);
@@ -29,15 +27,13 @@
 			return new TogglToTimesheetResult(entries.Length);
 		}
 
-		public static TimesheetToTogglResult UpdateToggl(string accountName)
-		{
-			CurrentAccountName = accountName;
+		public static TimesheetToTogglResult UpdateToggl() { 
 
 			var worker = WorkerRepository.GetCurrentWorker();
 
 			CheckAPIKey(worker);
 
-			var items = Timesheet.GenerateTogglData(accountName);
+			var items = Timesheet.GenerateTogglData(CurrentAccountName);
 
 			WorkerRepository.SaveWorkerAssignments(items, worker);
 

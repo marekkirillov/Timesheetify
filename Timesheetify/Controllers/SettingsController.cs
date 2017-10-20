@@ -36,7 +36,7 @@ namespace Timesheetify.Controllers
 					context.Workers.AddOrUpdate(worker);
 					context.SaveChanges();
 				}
-			
+
 				LogRequest(Action.SaveSettings, "OK");
 
 			}
@@ -53,12 +53,14 @@ namespace Timesheetify.Controllers
 
 		private IList<SelectListItem> GetListOfWorkspaces(string apiKey)
 		{
-			return new Toggl(apiKey, CurrentWorker.WorkspaceName).GetAllToggleWorkspaces().Select(w => new SelectListItem
-			{
-				Value = w.id,
-				Text = w.name
-			}).ToList();
-		}
+			if (ApiIsValid(apiKey))
+				return new Toggl(apiKey, CurrentWorker.WorkspaceName).GetAllToggleWorkspaces().Select(w => new SelectListItem
+				{
+					Value = w.id,
+					Text = w.name
+				}).ToList();
 
+			return new List<SelectListItem>();
+		}
 	}
 }

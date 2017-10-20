@@ -72,7 +72,7 @@
                                                 <li>Sign-in to your Toggl account</li>
                                                 <li>Choose Workspaces from menu on the left</li>
                                                 <li>Choose create new workspace</li>
-                                                <li>Name it to Net Group</li>
+                                                <li>Name it to Net Group (you can also use existing workspace - see advanced settings)</li>
                                                 <li>Click continue (no need to add additional emails)</li>
                                                 <li>Click on Use free version</li>
                                             </ul>
@@ -91,7 +91,7 @@
                                         <div class="panel-body">
                                             <ul>
                                                 <li>Advanced settings will only be available if Toggl API key is present</li>
-                                                <li>Cleanup - While syncing data from Timesheet to Toggl, cleanup will determine if old tags from toggl should be deleted</li>
+                                                <li>Cleanup - While syncing data from Timesheet to Toggl, cleanup will determine if old tags from toggl should be deleted and old projects archived</li>
                                                 <li>Toggl workspace - Determines the Toggl workspace to use to sync data from Toggl to Timesheed and vice versa</li>
                                             </ul>
                                         </div>
@@ -113,7 +113,6 @@
                                                 <li>This action synchronizes your assignments and projects from Project Server to Toggl</li>
                                                 <li>It creates new projects to Toggl to map them to Project Server projects</li>
                                                 <li>It creates tags with specific structure <strong>(PS: Taskname > Project name)</strong> to Toggl to map them to Project Server assignments</li>
-                                                <li>Ths action should be used at least once a day, preferably at mornings, to get up-to-date tasks and projects to Toggl for time tracking</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -131,9 +130,8 @@
                                             <ul>
                                                 <li>This action synchronizes your time tracking data from Toggl to Timesheet</li>
                                                 <li>To use this functionality you must use predefined (see previous step) projects and tags in Toggl</li>
-                                                <li>The descriptions of tasks in Toggl Administrative projects will be transferred to Timesheet's line Comment field</li>
-                                                <li>This action should be used at least once a week, preferably on friday evening, because it is highly recommended to fill your timesheet each week</li>
-                                                <li>Toggl to Timesheet cannot synchronize time tracking data of weekends, you must add these to timesheet manually</li>
+                                                <li>The descriptions of tasks in Toggl <strong>Administrative</strong> projects will be transferred to Timesheet's line Comment field</li>
+                                                <li>Toggl to Timesheet cannot synchronize time tracking data of weekends, so you must add these to timesheet manually</li>
                                             </ul>
                                         </div>
                                     </div>

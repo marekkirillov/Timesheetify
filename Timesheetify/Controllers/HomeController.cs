@@ -18,8 +18,6 @@ namespace Timesheetify.Controllers
 	{
 		public ActionResult Index()
 		{
-			Timesheetify.CurrentAccountName = User.Identity.Name;
-
 			var model = new Model
 			{
 				Name = User.Identity.Name,
@@ -30,13 +28,23 @@ namespace Timesheetify.Controllers
 				Weeks = GetListOfPreviousMondays()
 			};
 
-
 			return View(model);
 		}
 
 		public ActionResult Save(Model model)
 		{
-			SaveKey(model);
+			if (ApiIsValid(model.ApiKey))
+				try
+				{
+					SaveKey(model);
+				}
+				catch (Exception e)
+				{
+					ErrorMsg = e.Message;
+					LogError(e);
+				}
+			else
+				ErrorMsg = "API key not valid";
 
 			Redirected = true;
 			return RedirectToAction("Index");
@@ -49,7 +57,7 @@ namespace Timesheetify.Controllers
 			{
 				try
 				{
-					var result = Timesheetify.UpdateTimesheet(User.Identity.Name, model.SelectedWeek);
+					var result = Timesheetify.UpdateTimesheet(model.SelectedWeek);
 					SuccessMsg = $"Successfully added {result.NewTimesheetLines} entries to Timesheet";
 					LogRequest(Action.TogglToTimesheet, SuccessMsg);
 				}
@@ -71,7 +79,7 @@ namespace Timesheetify.Controllers
 		{
 			try
 			{
-				var result = Timesheetify.UpdateToggl(User.Identity.Name);
+				var result = Timesheetify.UpdateToggl();
 				SuccessMsg = result.IsUpToDate ? "Already up-to-date" : GetResultMessage(result);
 				LogRequest(Action.TimesheetToToggl, SuccessMsg);
 			}
@@ -158,7 +166,7 @@ namespace Timesheetify.Controllers
 					isLastMonthMondayAdded = true;
 				}
 
-					list.Add(monday);
+				list.Add(monday);
 			}
 
 			return list.Where(Timesheet.IsTimesheetOpen);
