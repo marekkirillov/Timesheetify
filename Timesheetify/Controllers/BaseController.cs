@@ -4,6 +4,9 @@ namespace Timesheetify.Controllers
 {
 	using System;
 	using System.IO;
+	using System.ServiceModel;
+	using System.Web.Services.Protocols;
+	using Helpers;
 	using TogglToTimesheet.Data;
 	using TogglToTimesheet.Repository;
 
@@ -59,6 +62,8 @@ namespace Timesheetify.Controllers
 			}
 		}
 
+		public string CurrentUsername => User.Identity.Name.CleanName();
+
 		public enum Action
 		{
 			TogglToTimesheet = 1,
@@ -70,7 +75,7 @@ namespace Timesheetify.Controllers
 		public void LogError(Exception e)
 		{
 			var path = GetPath();
-			var error = $"{Environment.NewLine}ERROR - {DateTime.Now} - {User.Identity.Name} - {e.Message}";
+			var error = $"{Environment.NewLine}ERROR - {DateTime.Now} - {User.Identity.Name.CleanName()} - {e.Message}";
 			var stacktrace = $"{Environment.NewLine}{e.StackTrace}";
 
 			if (e.InnerException != null)
@@ -81,6 +86,10 @@ namespace Timesheetify.Controllers
 
 			System.IO.File.AppendAllText(path, error);
 			System.IO.File.AppendAllText(path, stacktrace);
+
+			if (e is FaultException)
+				System.IO.File.AppendAllText(path, ((FaultException)e).Message);
+
 		}
 
 		protected static bool ApiIsValid(string key)
@@ -100,7 +109,7 @@ namespace Timesheetify.Controllers
 
 		public void LogRequest(Action action, string success)
 		{
-			var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name} - {(action == Action.TimesheetToToggl ? "Timesheet -> Toggl" : action == Action.TogglToTimesheet ? "Toggl -> Timesheet" : "Toggl API key saved")} - with message:{success}";
+			var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name.CleanName()} - {(action == Action.TimesheetToToggl ? "Timesheet -> Toggl" : action == Action.TogglToTimesheet ? "Toggl -> Timesheet" : "Toggl API key saved")} - with message:{success}";
 
 			System.IO.File.AppendAllText(path, msg);
 		}

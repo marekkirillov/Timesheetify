@@ -6,6 +6,7 @@ namespace Timesheetify.Controllers
 	using System.Collections.Generic;
 	using System.Data.Entity.Migrations;
 	using System.Linq;
+	using Helpers;
 	using Models;
 	using TogglToTimesheet;
 	using TogglToTimesheet.Data;
@@ -30,7 +31,7 @@ namespace Timesheetify.Controllers
 			{
 				using (var context = new TimesheetifyEntities())
 				{
-					var worker = context.Workers.First(f => f.Identity.Equals(User.Identity.Name));
+					var worker = context.Workers.First(f => f.Identity.Equals(CurrentUsername));
 					worker.Cleanup = model.Cleanup;
 					worker.WorkspaceName = model.WorkspaceId;
 					context.Workers.AddOrUpdate(worker);

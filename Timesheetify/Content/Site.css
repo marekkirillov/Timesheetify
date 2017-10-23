@@ -24,7 +24,7 @@ h1#heading {
     padding: 50px 35px 125px 35px;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    height: 418px;
+    height: 380px;
     overflow: hidden
 }
 
@@ -241,7 +241,7 @@ body.modal-open, .modal-open .navbar-fixed-top, .modal-open .navbar-fixed-bottom
 .synchronizing {
     width: 150px;
     position: absolute;
-    top: 125px;
+    top: 100px;
     left: 50%;
     transform: translateX(-50%);
 }

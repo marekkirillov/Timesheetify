@@ -10,6 +10,7 @@ namespace Timesheetify.Controllers
 	using Models;
 	using TogglToTimesheet;
 	using System.Web.Http;
+	using Helpers;
 	using TogglToTimesheet.Data;
 	using TogglToTimesheet.DTO;
 
@@ -20,13 +21,25 @@ namespace Timesheetify.Controllers
 		{
 			var model = new Model
 			{
-				Name = User.Identity.Name,
+				Name = User.Identity.Name.CleanName(),
 				ApiKey = CurrentWorker?.TogglApiKey,
 				ShowSuccess = Redirected,
-				Error = ErrorMsg,
 				Success = SuccessMsg,
-				Weeks = GetListOfPreviousMondays()
+				Error = ErrorMsg
 			};
+
+			try
+			{
+				model.Weeks = GetListOfPreviousMondays();
+
+			}
+			catch (Exception e)
+			{
+				model.Error = e.Message;
+				LogError(e);
+				model.Weeks = new List<SelectListItem>();
+			}
+
 
 			return View(model);
 		}
@@ -122,9 +135,9 @@ namespace Timesheetify.Controllers
 		{
 			using (var context = new TimesheetifyEntities())
 			{
-				var worker = context.Workers.FirstOrDefault(f => f.Identity.Equals(User.Identity.Name)) ?? new Worker
+				var worker = context.Workers.FirstOrDefault(f => f.Identity.Equals(CurrentUsername)) ?? new Worker
 				{
-					Identity = User.Identity.Name
+					Identity = User.Identity.Name.CleanName()
 				};
 
 				new Toggl(model.ApiKey, null).ValidateApiKey(model.ApiKey);
@@ -143,14 +156,18 @@ namespace Timesheetify.Controllers
 				.Select(m => new SelectListItem
 				{
 					Value = m.ToString("O"),
-					Text = m.ToShortDateString()
+					Text = m.ToString("dd.MM.yyyy")
 				}).ToList();
 		}
 
 		private static IEnumerable<DateTime> GetListOfPrevousMondays()
 		{
 			var list = new List<DateTime>();
-			var today = (int)DateTime.Today.DayOfWeek;
+			var today = DateTime.Today.DayOfWeek;
+
+			if (today == DayOfWeek.Sunday)
+				today = DayOfWeek.Saturday;
+
 			var currentMonth = DateTime.Today.Month;
 			var isLastMonthMondayAdded = false;
 
@@ -158,7 +175,7 @@ namespace Timesheetify.Controllers
 
 			while (list.Count < maxWeeks)
 			{
-				var monday = DateTime.Today.AddDays(-today + (int)DayOfWeek.Monday - list.Count * 7);
+				var monday = DateTime.Today.AddDays(-(int)today + (int)DayOfWeek.Monday - list.Count * 7);
 
 				if (monday.Month != currentMonth)
 				{
@@ -171,5 +188,7 @@ namespace Timesheetify.Controllers
 
 			return list.Where(Timesheet.IsTimesheetOpen);
 		}
+
+		
 	}
 }

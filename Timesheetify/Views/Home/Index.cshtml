@@ -17,7 +17,7 @@ else if (Model.ShowSuccess)
     <div class="main-form-container">
         <div class="main-form">
             <div class="front">
-                <h2 class="text-center">Synchronize</h2>
+                <h2 class="text-center"></h2>
                 <div class="form-group">
                     <label class="control-label">User</label>
                     @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @readonly = "readonly" })
@@ -115,7 +115,10 @@ else if (Model.ShowSuccess)
     </div>
 </div>
 
-@{ Html.RenderAction("Index", "Settings"); }
+@if (!Model.ApiKey.IsNullOrWhiteSpace())
+{
+    Html.RenderAction("Index", "Settings");
+}
 
 <script type="text/javascript">
     $(function () {

@@ -5,6 +5,7 @@
 	using System.Data;
 	using System.Linq;
 	using System.Runtime.Caching;
+	using System.ServiceModel;
 	using Common;
 	using DTO;
 	using Microsoft.Office.Project.Server.Library;
@@ -24,12 +25,28 @@
 			var timesheetPeriod = GetTimesheetPeriod(startDate);
 			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(Timesheetify.CurrentAccountName))
 			{
-				var timesheet = context.Client.ReadTimesheetByPeriod(context.UserUid, timesheetPeriod.WPRD_UID, Navigation.Current);
-				if (timesheet == null)
-					return true;
+				try
+				{
+					var timesheet = context.Client.ReadTimesheetByPeriod(context.UserUid, timesheetPeriod.WPRD_UID, Navigation.Current);
+					if (timesheet == null)
+						return true;
 
-				var status = timesheet.Headers[0].TS_STATUS_ENUM;
-				return status == (byte) TimesheetEnum.Status.InProgress || status == (byte) TimesheetEnum.Status.Rejected;
+					if (timesheet.Headers.Count == 0)
+						return false;
+
+					var status = timesheet.Headers[0].TS_STATUS_ENUM;
+					return status == (byte)TimesheetEnum.Status.InProgress || status == (byte)TimesheetEnum.Status.Rejected;
+				}
+				catch (Exception e)
+				{
+					if (e is FaultException)
+					{
+						var xml = ((FaultException)e).CreateMessageFault().GetDetail<SvcTimeSheet.ServerExecutionFault>()
+							.ExceptionDetails.InnerXml;
+						throw new Exception(xml);
+					}
+					throw;
+				}
 			}
 		}
 
@@ -178,11 +195,26 @@
 		{
 			using (var context = new ImpersonationContext<AdminClient, SvcAdmin.Admin>(Timesheetify.CurrentAccountName))
 			{
-				var periods = context.Client.ReadPeriods(PeriodState.Open);
+				try
+				{
+					var periods = context.Client.ReadPeriods(PeriodState.Open);
 
-				foreach (TimePeriodDataSet.TimePeriodsRow periodsTimePeriod in periods.TimePeriods.Rows)
-					if (periodsTimePeriod.WPRD_START_DATE.Date.Equals((startDate ?? GetFirstDayOfWeek()).Date))
-						return periodsTimePeriod;
+					foreach (TimePeriodDataSet.TimePeriodsRow periodsTimePeriod in periods.TimePeriods.Rows)
+						if (periodsTimePeriod.WPRD_START_DATE.Date.Equals((startDate ?? GetFirstDayOfWeek()).Date))
+							return periodsTimePeriod;
+				}
+				catch (Exception e)
+				{
+
+					if (e is FaultException)
+					{
+						var xml = ((FaultException)e).CreateMessageFault().GetDetail<SvcAdmin.ServerExecutionFault>().ExceptionDetails.InnerXml;
+						throw new Exception(xml);
+					}
+
+					throw;
+				}
+
 			}
 
 			return null;
@@ -226,7 +258,20 @@
 						new Filter.FieldOperator(Filter.FieldOperationType.GreaterThan, resourceAssignmentDataSet.ResourceAssignment.ASSN_START_DATEColumn.ColumnName, startCriteria))
 				};
 
-				resourceAssignmentDataSet = context.Client.ReadResourceAssignments(filter.GetXml());
+				try
+				{
+					resourceAssignmentDataSet = context.Client.ReadResourceAssignments(filter.GetXml());
+				}
+				catch (Exception e)
+				{
+					if (e is FaultException)
+					{
+						var xml = ((FaultException)e).CreateMessageFault().GetDetail<SvcResource.ServerExecutionFault>()
+							.ExceptionDetails.InnerXml;
+						throw new Exception(xml);
+					}
+					throw;
+				}
 
 				for (var i = 0; i < resourceAssignmentDataSet.ResourceAssignment.Rows.Count; i++)
 				{
