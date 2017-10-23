@@ -32,7 +32,7 @@
 						return true;
 
 					if (timesheet.Headers.Count == 0)
-						return false;
+						return true;
 
 					var status = timesheet.Headers[0].TS_STATUS_ENUM;
 					return status == (byte)TimesheetEnum.Status.InProgress || status == (byte)TimesheetEnum.Status.Rejected;
