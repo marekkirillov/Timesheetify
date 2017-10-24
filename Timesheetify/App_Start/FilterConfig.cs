@@ -7,7 +7,6 @@ namespace Timesheetify
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
-			filters.Add(new RequestFilter());
             filters.Add(new HandleErrorAttribute());
         }
     }

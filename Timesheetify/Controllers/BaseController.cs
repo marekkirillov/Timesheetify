@@ -54,7 +54,7 @@ namespace Timesheetify.Controllers
 
 				if (worker == null)
 				{
-					worker = WorkerRepository.GetCurrentWorker();
+					worker = WorkerRepository.GetCurrentWorker(CurrentUsername);
 					HttpContext.Items["worker"] = worker;
 				}
 

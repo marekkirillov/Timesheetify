@@ -70,7 +70,7 @@ namespace Timesheetify.Controllers
 			{
 				try
 				{
-					var result = Timesheetify.UpdateTimesheet(model.SelectedWeek);
+					var result = Timesheetify.UpdateTimesheet(CurrentUsername, model.SelectedWeek);
 					SuccessMsg = $"Successfully added {result.NewTimesheetLines} entries to Timesheet";
 					LogRequest(Action.TogglToTimesheet, SuccessMsg);
 				}
@@ -92,7 +92,7 @@ namespace Timesheetify.Controllers
 		{
 			try
 			{
-				var result = Timesheetify.UpdateToggl();
+				var result = Timesheetify.UpdateToggl(CurrentUsername);
 				SuccessMsg = result.IsUpToDate ? "Already up-to-date" : GetResultMessage(result);
 				LogRequest(Action.TimesheetToToggl, SuccessMsg);
 			}
@@ -150,7 +150,7 @@ namespace Timesheetify.Controllers
 			}
 		}
 
-		private static IList<SelectListItem> GetListOfPreviousMondays()
+		private IList<SelectListItem> GetListOfPreviousMondays()
 		{
 			return GetListOfPrevousMondays()
 				.Select(m => new SelectListItem
@@ -160,7 +160,7 @@ namespace Timesheetify.Controllers
 				}).ToList();
 		}
 
-		private static IEnumerable<DateTime> GetListOfPrevousMondays()
+		private IEnumerable<DateTime> GetListOfPrevousMondays()
 		{
 			var list = new List<DateTime>();
 			var today = DateTime.Today.DayOfWeek;
@@ -186,9 +186,7 @@ namespace Timesheetify.Controllers
 				list.Add(monday);
 			}
 
-			return list.Where(Timesheet.IsTimesheetOpen);
+			return list.Where(l => Timesheet.IsTimesheetOpen(CurrentUsername, l));
 		}
-
-		
 	}
 }

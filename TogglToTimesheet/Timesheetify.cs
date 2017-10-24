@@ -8,11 +8,9 @@
 
 	public static class Timesheetify
 	{
-		public static string CurrentAccountName;
-
-		public static TogglToTimesheetResult UpdateTimesheet(DateTime? startDate = null)
+		public static TogglToTimesheetResult UpdateTimesheet(string accountName, DateTime? startDate = null)
 		{
-			var worker = WorkerRepository.GetCurrentWorker();
+			var worker = WorkerRepository.GetCurrentWorker(accountName);
 
 			CheckAPIKey(worker);
 
@@ -22,18 +20,18 @@
 				.ToTimesheetEntries()
 				.MergeSameDayEntries();
 
-			Timesheet.FillWeek(entries, startDate);
+			Timesheet.FillWeek(accountName, entries, startDate);
 
 			return new TogglToTimesheetResult(entries.Length);
 		}
 
-		public static TimesheetToTogglResult UpdateToggl() { 
+		public static TimesheetToTogglResult UpdateToggl(string accountName) { 
 
-			var worker = WorkerRepository.GetCurrentWorker();
+			var worker = WorkerRepository.GetCurrentWorker(accountName);
 
 			CheckAPIKey(worker);
 
-			var items = Timesheet.GenerateTogglData(CurrentAccountName);
+			var items = Timesheet.GenerateTogglData(accountName);
 
 			WorkerRepository.SaveWorkerAssignments(items, worker);
 

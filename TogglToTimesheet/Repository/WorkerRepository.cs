@@ -8,17 +8,17 @@
 
     public static class WorkerRepository
     {
-        public static Worker GetCurrentWorker()
+        public static Worker GetCurrentWorker(string accountName)
         {
             using (var context = new TimesheetifyEntities())
-                return context.Workers.FirstOrDefault(f => f.Identity.Equals(Timesheetify.CurrentAccountName));
+                return context.Workers.FirstOrDefault(f => f.Identity.Equals(accountName));
         }
 
-        public static List<WorkerAssignment> GetWorkerAssignments()
+        public static List<WorkerAssignment> GetWorkerAssignments(string accountName)
         {
             using (var context = new TimesheetifyEntities())
             {
-                var worker = GetCurrentWorker();
+                var worker = GetCurrentWorker(accountName);
                 return context.WorkerAssignments.Where(wa => wa.WorkerId.Equals(worker.Id)).ToList();
             }
         }

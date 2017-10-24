@@ -20,10 +20,10 @@
 	{
 		private static Dictionary<string, Guid> _lineClasses;
 
-		public static bool IsTimesheetOpen(DateTime startDate)
+		public static bool IsTimesheetOpen(string accountName, DateTime startDate)
 		{
-			var timesheetPeriod = GetTimesheetPeriod(startDate);
-			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(Timesheetify.CurrentAccountName))
+			var timesheetPeriod = GetTimesheetPeriod(accountName,startDate);
+			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(accountName))
 			{
 				try
 				{
@@ -50,17 +50,17 @@
 			}
 		}
 
-		internal static void FillWeek(TimesheetEntry[] timesheetEntries, DateTime? startDate = null)
+		internal static void FillWeek(string accountName, TimesheetEntry[] timesheetEntries, DateTime? startDate = null)
 		{
-			LoadLineClasses();
+			LoadLineClasses(accountName);
 
-			var timesheetPeriod = GetTimesheetPeriod(startDate);
+			var timesheetPeriod = GetTimesheetPeriod(accountName, startDate);
 
-			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(Timesheetify.CurrentAccountName))
+			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(accountName))
 			{
 				var timesheet = GetTimesheet(context, timesheetPeriod, out var TS_UID);
 				var timesheetRows = timesheet.Lines.Rows.Cast<TimesheetDataSet.LinesRow>().ToList();
-				var workerAssignments = WorkerRepository.GetWorkerAssignments();
+				var workerAssignments = WorkerRepository.GetWorkerAssignments(accountName);
 				var timesheetEntriesGrouped = timesheetEntries.GroupBy(t => t.Tag);
 
 				foreach (var timesheetEntryGroup in timesheetEntriesGrouped)
@@ -131,9 +131,9 @@
 			}
 		}
 
-		private static void LoadLineClasses()
+		private static void LoadLineClasses(string accountName)
 		{
-			_lineClasses = GetLineClasses();
+			_lineClasses = GetLineClasses(accountName);
 		}
 
 		private static Guid GetLineClass(TimesheetEntry timesheetEntry)
@@ -141,13 +141,13 @@
 			return timesheetEntry.IsAdministrative ? _lineClasses[timesheetEntry.Task] : _lineClasses["Standard"];
 		}
 
-		private static Dictionary<string, Guid> GetLineClasses()
+		private static Dictionary<string, Guid> GetLineClasses(string accountName)
 		{
 			var cache = new MemoryCache("static");
 			var value = (Dictionary<string, Guid>)cache.Get(Constants.LineClassCacheKey);
 			if (value == null)
 			{
-				using (var context = new ImpersonationContext<AdminClient, SvcAdmin.Admin>(Timesheetify.CurrentAccountName))
+				using (var context = new ImpersonationContext<AdminClient, SvcAdmin.Admin>(accountName))
 				{
 					var lineclasses = context.Client.ReadLineClasses(LineClassType.All, LineClassState.Enabled);
 					value = lineclasses
@@ -191,9 +191,9 @@
 			return timesheet;
 		}
 
-		private static TimePeriodDataSet.TimePeriodsRow GetTimesheetPeriod(DateTime? startDate)
+		private static TimePeriodDataSet.TimePeriodsRow GetTimesheetPeriod(string accountName, DateTime? startDate)
 		{
-			using (var context = new ImpersonationContext<AdminClient, SvcAdmin.Admin>(Timesheetify.CurrentAccountName))
+			using (var context = new ImpersonationContext<AdminClient, SvcAdmin.Admin>(accountName))
 			{
 				try
 				{
@@ -297,14 +297,14 @@
 				}
 			}
 
-			AddAdministrativeTasks(assignments);
+			AddAdministrativeTasks(accountName, assignments);
 
 			return assignments;
 		}
 
-		private static void AddAdministrativeTasks(List<ResourceAssignment> assignments)
+		private static void AddAdministrativeTasks(string accountName, List<ResourceAssignment> assignments)
 		{
-			using (var context = new ImpersonationContext<AdminClient, SvcAdmin.Admin>(Timesheetify.CurrentAccountName))
+			using (var context = new ImpersonationContext<AdminClient, SvcAdmin.Admin>(accountName))
 			{
 				var tsLineClassDs = context.Client.ReadLineClasses(LineClassType.AllNonProject, LineClassState.Enabled);
 
