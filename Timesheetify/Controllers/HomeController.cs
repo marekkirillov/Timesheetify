@@ -168,21 +168,11 @@ namespace Timesheetify.Controllers
 			if (today == DayOfWeek.Sunday)
 				today = DayOfWeek.Saturday;
 
-			var currentMonth = DateTime.Today.Month;
-			var isLastMonthMondayAdded = false;
-
 			const int maxWeeks = 5;
 
-			while (list.Count < maxWeeks)
+			for (var i = 1; i <= maxWeeks; i++)
 			{
 				var monday = DateTime.Today.AddDays(-(int)today + (int)DayOfWeek.Monday - list.Count * 7);
-
-				if (monday.Month != currentMonth)
-				{
-					if (isLastMonthMondayAdded) break;
-					isLastMonthMondayAdded = true;
-				}
-
 				list.Add(monday);
 			}
 

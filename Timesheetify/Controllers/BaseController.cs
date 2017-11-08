@@ -86,10 +86,6 @@ namespace Timesheetify.Controllers
 
 			System.IO.File.AppendAllText(path, error);
 			System.IO.File.AppendAllText(path, stacktrace);
-
-			if (e is FaultException)
-				System.IO.File.AppendAllText(path, ((FaultException)e).Message);
-
 		}
 
 		protected static bool ApiIsValid(string key)
