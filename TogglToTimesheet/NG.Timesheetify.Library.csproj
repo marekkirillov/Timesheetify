@@ -184,6 +184,7 @@
       <DependentUpon>Worker.tt</DependentUpon>
     </Compile>
     <Compile Include="DTO\ResourceAssignment.cs" />
+    <Compile Include="DTO\TimesheetApprover.cs" />
     <Compile Include="DTO\TimesheetToTogglResult.cs" />
     <Compile Include="DTO\TogglEntry.cs" />
     <Compile Include="DTO\TogglProject.cs" />

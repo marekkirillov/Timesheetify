@@ -38,7 +38,7 @@ h1#heading {
 .main-form .front:before {
     position: absolute;
     display: block;
-    content: 'V2.0';
+    content: 'V2.2';
     text-align: center;
     width: 130px;
     height: 30px;

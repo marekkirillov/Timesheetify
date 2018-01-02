@@ -23,6 +23,7 @@
 		public static bool IsTimesheetOpen(string accountName, DateTime startDate)
 		{
 			var timesheetPeriod = GetTimesheetPeriod(accountName, startDate);
+
 			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(accountName))
 			{
 				try
@@ -50,7 +51,7 @@
 			}
 		}
 
-		internal static void FillWeek(string accountName, TimesheetEntry[] timesheetEntries, DateTime? startDate = null)
+		internal static void FillWeek(string accountName, TimesheetEntry[] timesheetEntries, DateTime? startDate = null, bool submit = false)
 		{
 			LoadLineClasses(accountName);
 
@@ -132,6 +133,14 @@
 					}
 
 					context.Client.QueueUpdateTimesheet(Guid.NewGuid(), TS_UID, timesheet);
+					GetTimesheetApprovers(accountName, TS_UID);
+					if (submit)
+					{
+						var firstDayOfWeek = GetFirstDayOfWeek();
+						if (timesheetEntries.Sum(te=>te.Duration) < 40) throw new Exception("Cannot submit timesheet with less than 40 hours of work");
+						if((firstDayOfWeek.Date == startDate?.Date || startDate == null) && DateTime.Now.Date != firstDayOfWeek.AddDays(5).Date) throw new Exception("Cannot submit timesheet - week is not over yet :)");
+						context.Client.QueueSubmitTimesheet(Guid.NewGuid(), TS_UID, context.UserUid, "Auto-submitted by Timesheetify");
+					}
 				}
 				catch (Exception e)
 				{
@@ -139,6 +148,7 @@
 					{
 						var xml = ((FaultException)e).CreateMessageFault().GetDetail<SvcTimeSheet.ServerExecutionFault>()
 							.ExceptionDetails.InnerXml;
+
 						throw new Exception(xml);
 					}
 					throw;
@@ -352,6 +362,15 @@
 					ProjectUid = Guid.Empty,
 					AssignmentUid = Guid.Empty
 				}));
+			}
+		}
+
+		public static List<TimesheetApprover> GetTimesheetApprovers(string accountName, Guid tsuid)
+		{
+			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(accountName))
+			{
+				var a = context.Client.ReadTimesheetApprovers(tsuid);
+				return null;
 			}
 		}
 	}

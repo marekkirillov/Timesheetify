@@ -70,7 +70,7 @@ namespace Timesheetify.Controllers
 			{
 				try
 				{
-					var result = Timesheetify.UpdateTimesheet(CurrentUsername, model.SelectedWeek);
+					var result = Timesheetify.UpdateTimesheet(CurrentUsername, model.Submit, model.SelectedWeek);
 					SuccessMsg = $"Successfully added {result.NewTimesheetLines} entries to Timesheet";
 					LogRequest(Action.TogglToTimesheet, SuccessMsg);
 				}

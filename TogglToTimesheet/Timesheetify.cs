@@ -8,7 +8,7 @@
 
 	public static class Timesheetify
 	{
-		public static TogglToTimesheetResult UpdateTimesheet(string accountName, DateTime? startDate = null)
+		public static TogglToTimesheetResult UpdateTimesheet(string accountName, bool submit, DateTime? startDate = null)
 		{
 			var worker = WorkerRepository.GetCurrentWorker(accountName);
 
@@ -20,7 +20,7 @@
 				.ToTimesheetEntries()
 				.MergeSameDayEntries();
 
-			Timesheet.FillWeek(accountName, entries, startDate);
+			Timesheet.FillWeek(accountName, entries, startDate, submit);
 
 			return new TogglToTimesheetResult(entries.Length);
 		}
