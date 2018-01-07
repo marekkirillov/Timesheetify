@@ -20,7 +20,8 @@ namespace Timesheetify.Controllers
 			{
 				Workspaces = GetListOfWorkspaces(CurrentWorker.TogglApiKey),
 				WorkspaceId = CurrentWorker.WorkspaceName,
-				Cleanup = CurrentWorker.Cleanup
+				Cleanup = CurrentWorker.Cleanup,
+				EnableAutoSubmit = CurrentWorker.AutoSubmit.GetValueOrDefault()
 			};
 
 			return PartialView(model);
@@ -33,6 +34,7 @@ namespace Timesheetify.Controllers
 				{
 					var worker = context.Workers.First(f => f.Identity.Equals(CurrentUsername));
 					worker.Cleanup = model.Cleanup;
+					worker.AutoSubmit = model.EnableAutoSubmit;
 					worker.WorkspaceName = model.WorkspaceId;
 					context.Workers.AddOrUpdate(worker);
 					context.SaveChanges();

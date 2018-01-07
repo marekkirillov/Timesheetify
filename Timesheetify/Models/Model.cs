@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Timesheetify.Models
@@ -9,6 +10,7 @@ namespace Timesheetify.Models
 		public Model()
 		{
 			ShowSuccess = true;
+			Approvers = new List<SelectListItem>();
 		}
 
 		public string Name { get; set; }
@@ -21,10 +23,12 @@ namespace Timesheetify.Models
 
 		public string Success { get; set; }
 
-        public IList<SelectListItem> Weeks { get; set; }
-        public DateTime? SelectedWeek { get; set; }
-	    public NotificationModel Notification { get; set; }
-		public bool Submit { get; set; }
+		public IList<SelectListItem> Weeks { get; set; }
+		public IList<SelectListItem> Approvers { get; set; }
+		public DateTime? SelectedWeek { get; set; }
+		public NotificationModel Notification { get; set; }
+		public bool AutosubmitEnabled { get; set; }
+		public Guid? SelectedApprover { get; set; }
 
 	}
 }

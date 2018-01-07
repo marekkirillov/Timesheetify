@@ -20,7 +20,7 @@
 	{
 		private static Dictionary<string, Guid> _lineClasses;
 
-		public static bool IsTimesheetOpen(string accountName, DateTime startDate)
+		public static bool IsTimesheetOpen(string accountName, DateTime startDate, Dictionary<Guid, List<TimesheetApprover>> approvers = null)
 		{
 			var timesheetPeriod = GetTimesheetPeriod(accountName, startDate);
 
@@ -38,7 +38,12 @@
 						return true;
 
 					var status = timesheet.Headers[0].TS_STATUS_ENUM;
-					return status == (byte)TimesheetEnum.Status.InProgress || status == (byte)TimesheetEnum.Status.Rejected;
+					var isTimesheetOpen = status == (byte)TimesheetEnum.Status.InProgress || status == (byte)TimesheetEnum.Status.Rejected;
+
+					if (isTimesheetOpen && approvers != null && approvers.Count == 0)
+						approvers.Add(timesheet.Headers[0].TS_UID, GetTimesheetApprovers(accountName, timesheet.Headers[0].TS_UID));
+
+					return isTimesheetOpen;
 				}
 				catch (Exception e)
 				{
@@ -53,7 +58,7 @@
 			}
 		}
 
-		internal static void FillWeek(string accountName, TimesheetEntry[] timesheetEntries, DateTime? startDate = null, bool submit = false)
+		internal static string FillWeek(string accountName, TimesheetEntry[] timesheetEntries, DateTime? startDate = null, Guid? approver = null)
 		{
 			LoadLineClasses(accountName);
 
@@ -135,13 +140,11 @@
 					}
 
 					context.Client.QueueUpdateTimesheet(Guid.NewGuid(), TS_UID, timesheet);
-					GetTimesheetApprovers(accountName, TS_UID);
-					if (submit)
+
+					if (approver.HasValue)
 					{
-						var firstDayOfWeek = GetFirstDayOfWeek();
-						if (timesheetEntries.Sum(te=>te.Duration) < 40) throw new Exception("Cannot submit timesheet with less than 40 hours of work");
-						if((firstDayOfWeek.Date == startDate?.Date || startDate == null) && DateTime.Now.Date != firstDayOfWeek.AddDays(5).Date) throw new Exception("Cannot submit timesheet - week is not over yet :)");
-						context.Client.QueueSubmitTimesheet(Guid.NewGuid(), TS_UID, context.UserUid, "Auto-submitted by Timesheetify");
+						if (timesheetEntries.Sum(te => te.Duration) < 40) return "Cannot submit timesheet with less than 40 hours of work";
+						context.Client.QueueSubmitTimesheet(Guid.NewGuid(), TS_UID, approver.Value, $"Auto-submitted by Timesheetify at {DateTime.Now.ToShortDateString()}");
 					}
 				}
 				catch (Exception e)
@@ -156,6 +159,8 @@
 					throw;
 				}
 			}
+
+			return null;
 		}
 
 		private static void LoadLineClasses(string accountName)
@@ -371,8 +376,15 @@
 		{
 			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(accountName))
 			{
-				var a = context.Client.ReadTimesheetApprovers(tsuid);
-				return null;
+				var approvers = context.Client.ReadTimesheetApprovers(tsuid);
+				var a = approvers.Tables["Resources"].Rows.Cast<SvcTimeSheet.ResourceDataSet.ResourcesRow>().Select(n =>
+					new TimesheetApprover
+					{
+						Name = n["RES_NAME"].ToString(),
+						Uid = new Guid(n["RES_UID"].ToString())
+					});
+
+				return a.ToList();
 			}
 		}
 	}

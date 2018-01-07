@@ -13,9 +13,15 @@
                 <div class="modal-body">
                     <div class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label">Cleanup</label>
+                            <label class="col-sm-4 control-label">Cleanup Toggl</label>
                             <div class="col-sm-8">
                                 @Html.CheckBoxFor(m => m.Cleanup, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Enable autosubmit</label>
+                            <div class="col-sm-8">
+                                @Html.CheckBoxFor(m => m.EnableAutoSubmit, new { @class = "form-control" })
                             </div>
                         </div>
                         <div class="form-group">

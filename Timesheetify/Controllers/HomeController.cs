@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
+using Microsoft.Ajax.Utilities;
 using TogglToTimesheet.Active_Directory;
 using TogglToTimesheet.Repository;
 
@@ -30,7 +31,8 @@ namespace Timesheetify.Controllers
 				ApiKey = CurrentWorker?.TogglApiKey,
 				ShowSuccess = Redirected,
 				Success = SuccessMsg,
-				Error = ErrorMsg
+				Error = ErrorMsg,
+				AutosubmitEnabled = CurrentWorker?.AutoSubmit ?? false
 			};
 
 			if (notification != null)
@@ -46,16 +48,15 @@ namespace Timesheetify.Controllers
 
 			try
 			{
-				model.Weeks = GetListOfPreviousMondays();
-
+				FillLists(model);
 			}
 			catch (Exception e)
 			{
 				model.Error = e.Message;
 				LogError(e);
 				model.Weeks = new List<SelectListItem>();
+				model.Approvers = new List<SelectListItem>();
 			}
-
 
 			return View(model);
 		}
@@ -86,9 +87,14 @@ namespace Timesheetify.Controllers
 			{
 				try
 				{
-					var result = Timesheetify.UpdateTimesheet(CurrentUsername, model.Submit, model.SelectedWeek);
+					var result = Timesheetify.UpdateTimesheet(CurrentUsername, model.SelectedWeek, model.SelectedApprover);
 					SuccessMsg = $"Successfully added {result.NewTimesheetLines} entries to Timesheet";
 					LogRequest(Action.TogglToTimesheet, SuccessMsg);
+
+					if (model.SelectedApprover!=null && string.IsNullOrEmpty(result.Message) && CurrentWorker.AutoSubmit.GetValueOrDefault())
+						SuccessMsg = $"Timesheet with {result.NewTimesheetLines} entries submitted successfully";
+					else
+						ErrorMsg = result.Message;
 				}
 				catch (Exception e)
 				{
@@ -163,17 +169,35 @@ namespace Timesheetify.Controllers
 			}
 		}
 
-		private IList<SelectListItem> GetListOfPreviousMondays()
+		private void FillLists(Model model)
 		{
-			return GetListOfPrevousMondays()
-				.Select(m => new SelectListItem
+			var approvers = model.AutosubmitEnabled ? new Dictionary<Guid, List<TimesheetApprover>>() : null;
+			model.Weeks = GetListOfPrevousMondays(approvers).Select(m => new SelectListItem
+			{
+				Value = m.ToString("O"),
+				Text = m.ToString("dd.MM.yyyy")
+			}).ToList();
+
+			if (model.AutosubmitEnabled)
+			{
+				var uniqueApprovers = approvers.SelectMany(a => a.Value).DistinctBy(a => a.Uid);
+				model.Approvers = uniqueApprovers.Select(m => new SelectListItem
 				{
-					Value = m.ToString("O"),
-					Text = m.ToString("dd.MM.yyyy")
+					Value = m.Uid.ToString(),
+					Text = m.Name
 				}).ToList();
+
+				model.Approvers.Insert(0,new SelectListItem
+				{
+					Value = null,
+					Text = "Do not submit"
+				});
+
+				model.SelectedApprover = CurrentWorker?.ApproverGuid;
+			}
 		}
 
-		private IEnumerable<DateTime> GetListOfPrevousMondays()
+		private IEnumerable<DateTime> GetListOfPrevousMondays(Dictionary<Guid, List<TimesheetApprover>> approvers = null)
 		{
 			var list = new List<DateTime>();
 			var today = DateTime.Today.DayOfWeek;
@@ -188,9 +212,9 @@ namespace Timesheetify.Controllers
 				var monday = DateTime.Today.AddDays(-(int)today + (int)DayOfWeek.Monday - list.Count * 7);
 				if (monday.DayOfWeek != DayOfWeek.Monday) monday = monday.AddDays(-1);
 				list.Add(monday);
-			 }
+			}
 
-			return list.Where(l => Timesheet.IsTimesheetOpen(CurrentUsername, l));
+			return list.Where(l => Timesheet.IsTimesheetOpen(CurrentUsername, l, approvers));
 		}
 
 		[HttpPost]

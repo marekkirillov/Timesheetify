@@ -162,6 +162,9 @@
     <Compile Include="Active Directory\AdUserProvider.cs" />
     <Compile Include="Active Directory\User.cs" />
     <Compile Include="Common\Constants.cs" />
+    <Compile Include="Data\Approver.cs">
+      <DependentUpon>Worker.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\Notification.cs">
       <DependentUpon>Worker.tt</DependentUpon>
     </Compile>

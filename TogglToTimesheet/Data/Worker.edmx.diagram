@@ -10,6 +10,7 @@
         <AssociationConnector Association="TimesheetifyModel.FK_WorkerAssignment_Worker" />
         <EntityTypeShape EntityType="TimesheetifyModel.Notification" Width="1.5" PointX="0.5" PointY="5.125" />
         <AssociationConnector Association="TimesheetifyModel.WorkerNotification" />
+        <EntityTypeShape EntityType="TimesheetifyModel.Approver" Width="1.5" PointX="3.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

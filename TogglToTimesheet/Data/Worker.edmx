@@ -5,6 +5,16 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="TimesheetifyModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Timesheetify.dbo.Approvers' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Approvers">
+          <Key>
+            <PropertyRef Name="Uid" />
+            <PropertyRef Name="Name" />
+          </Key>
+          <Property Name="Uid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="500" Nullable="false" />
+        </EntityType>
         <EntityType Name="Notification">
           <Key>
             <PropertyRef Name="Id" />
@@ -22,6 +32,8 @@
           <Property Name="TogglApiKey" Type="nvarchar" MaxLength="200" />
           <Property Name="WorkspaceName" Type="nvarchar" MaxLength="200" />
           <Property Name="Cleanup" Type="bit" Nullable="false" />
+          <Property Name="AutoSubmit" Type="bit" />
+          <Property Name="ApproverGuid" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="WorkerAssignment">
           <Key>
@@ -83,6 +95,12 @@
           <EntitySet Name="Worker" EntityType="Self.Worker" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="WorkerAssignment" EntityType="Self.WorkerAssignment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="WorkerNotification" EntityType="Self.WorkerNotification" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Approvers" EntityType="Self.Approvers" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Approvers].[Uid] AS [Uid], 
+    [Approvers].[Name] AS [Name]
+    FROM [dbo].[Approvers] AS [Approvers]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_Notification" Association="Self.FK_Notification">
             <End Role="Notification" EntitySet="Notification" />
             <End Role="WorkerNotification" EntitySet="WorkerNotification" />
@@ -111,6 +129,8 @@
           <NavigationProperty Name="WorkerAssignments" Relationship="TimesheetifyModel.FK_WorkerAssignment_Worker" FromRole="Worker" ToRole="WorkerAssignment" />
           <Property Name="Cleanup" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Notifications" Relationship="TimesheetifyModel.WorkerNotification" FromRole="Worker" ToRole="Notification" />
+          <Property Name="AutoSubmit" Type="Boolean" />
+          <Property Name="ApproverGuid" Type="Guid" />
         </EntityType>
         <EntityContainer Name="TimesheetifyEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Workers" EntityType="Self.Worker" />
@@ -124,6 +144,7 @@
             <End Role="Notification" EntitySet="Notifications" />
             <End Role="Worker" EntitySet="Workers" />
           </AssociationSet>
+          <EntitySet Name="Approvers" EntityType="TimesheetifyModel.Approver" />
         </EntityContainer>
         <EntityType Name="WorkerAssignment">
           <Key>
@@ -162,6 +183,14 @@
           <End Type="TimesheetifyModel.Notification" Role="Notification" Multiplicity="*" />
           <End Type="TimesheetifyModel.Worker" Role="Worker" Multiplicity="*" />
         </Association>
+        <EntityType Name="Approver">
+          <Key>
+            <PropertyRef Name="Uid" />
+            <PropertyRef Name="Name" />
+          </Key>
+          <Property Name="Uid" Type="Guid" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -171,6 +200,8 @@
           <EntitySetMapping Name="Workers">
             <EntityTypeMapping TypeName="TimesheetifyModel.Worker">
               <MappingFragment StoreEntitySet="Worker">
+                <ScalarProperty Name="ApproverGuid" ColumnName="ApproverGuid" />
+                <ScalarProperty Name="AutoSubmit" ColumnName="AutoSubmit" />
                 <ScalarProperty Name="Cleanup" ColumnName="Cleanup" />
                 <ScalarProperty Name="WorkspaceName" ColumnName="WorkspaceName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
@@ -208,6 +239,14 @@
               <ScalarProperty Name="Id" ColumnName="NotificationId" />
             </EndProperty>
           </AssociationSetMapping>
+          <EntitySetMapping Name="Approvers">
+            <EntityTypeMapping TypeName="TimesheetifyModel.Approver">
+              <MappingFragment StoreEntitySet="Approvers">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Uid" ColumnName="Uid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

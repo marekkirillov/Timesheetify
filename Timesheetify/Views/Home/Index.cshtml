@@ -1,17 +1,16 @@
 ﻿@using Microsoft.Ajax.Utilities
 @model Timesheetify.Models.Model
 
-@if (!string.IsNullOrEmpty(Model.Error))
-{
-    <div class="alert alert-danger" role="alert">@Model.Error</div>
-}
-else if (Model.ShowSuccess)
+@if (Model.ShowSuccess)
 {
     <div class="alert alert-success" role="alert">
         @(Model.Success ?? "Changes saved.")
     </div>
 }
-
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger" role="alert">@Model.Error</div>
+}
 @using (Html.BeginForm("Save", "Home"))
 {
     <div class="main-form-container">
@@ -86,12 +85,15 @@ else if (Model.ShowSuccess)
                             @Html.DropDownListFor(m => m.SelectedWeek, Model.Weeks, new { @class = "form-control" })
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label">Submit timesheet</label>
-                        <div class="col-sm-8">
-                            @Html.CheckBoxFor(m => m.Submit, new { @class = "form-control" })
+                    @if (Model.AutosubmitEnabled)
+                    {
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Approver</label>
+                            <div class="col-sm-9">
+                                @Html.DropDownListFor(m => m.SelectedApprover, Model.Approvers, new { @class = "form-control" })
+                            </div>
                         </div>
-                    </div>
+}
                 </div>
             </div>
             <div class="modal-footer">

@@ -92,6 +92,7 @@
                                             <ul>
                                                 <li>Advanced settings will only be available if Toggl API key is present</li>
                                                 <li>Cleanup - While syncing data from Timesheet to Toggl, cleanup will determine if old tags from toggl should be deleted and old projects archived</li>
+                                                <li>Autosubmit enabled - When set to true, Timesheetify will try to submit the week which data is currently being syncronized to Timesheet. A new dropdown will appear on Toggl to Timesheet action, where you can select the approver of Timesheet.</li>
                                                 <li>Toggl workspace - Determines the Toggl workspace to use to sync data from Toggl to Timesheed and vice versa</li>
                                             </ul>
                                         </div>
@@ -132,6 +133,8 @@
                                                 <li>To use this functionality you must use predefined (see previous step) projects and tags in Toggl</li>
                                                 <li>The descriptions of tasks in Toggl <strong>Administrative</strong> projects will be transferred to Timesheet's line Comment field</li>
                                                 <li>Toggl to Timesheet cannot synchronize time tracking data of weekends, so you must add these to timesheet manually</li>
+                                                <li>Week to sync - choose which week data you want to send to Timesheet. This contains last 5 mondeys of Timesheets int Open or Rejected status.</li>
+                                                <li>Approver - choose who will approve your Timesheet (usually its your Team/Project manager). This is present only when Auto-submit is enabled from Advanced settings. The default value is the value used last time (if present). If not choosing any approver, the week will be synced but not submitted.</li>
                                             </ul>
                                         </div>
                                     </div>

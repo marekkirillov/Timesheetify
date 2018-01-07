@@ -6,6 +6,7 @@
 	public class SettingsModel
 	{
 		public bool Cleanup { get; set; }
+		public bool EnableAutoSubmit { get; set; }
 		public string WorkspaceId { get; set; }
 
 		public IList<SelectListItem> Workspaces { get; set; }
