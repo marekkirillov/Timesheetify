@@ -5,6 +5,14 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="TimesheetifyModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Notification">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Heading" Type="nvarchar" MaxLength="400" />
+          <Property Name="ContentHTML" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="Worker">
           <Key>
             <PropertyRef Name="Id" />
@@ -26,6 +34,38 @@
           <Property Name="AssignmentGuid" Type="uniqueidentifier" Nullable="false" />
           <Property Name="WorkerId" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="WorkerNotification">
+          <Key>
+            <PropertyRef Name="WorkerId" />
+            <PropertyRef Name="NotificationId" />
+          </Key>
+          <Property Name="WorkerId" Type="int" Nullable="false" />
+          <Property Name="NotificationId" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Notification">
+          <End Role="Notification" Type="Self.Notification" Multiplicity="1" />
+          <End Role="WorkerNotification" Type="Self.WorkerNotification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Notification">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="WorkerNotification">
+              <PropertyRef Name="NotificationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Worker">
+          <End Role="Worker" Type="Self.Worker" Multiplicity="1" />
+          <End Role="WorkerNotification" Type="Self.WorkerNotification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Worker">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="WorkerNotification">
+              <PropertyRef Name="WorkerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_WorkerAssignment_Worker">
           <End Role="Worker" Type="Self.Worker" Multiplicity="1" />
           <End Role="WorkerAssignment" Type="Self.WorkerAssignment" Multiplicity="*" />
@@ -39,8 +79,18 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="TimesheetifyModelStoreContainer">
+          <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Worker" EntityType="Self.Worker" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="WorkerAssignment" EntityType="Self.WorkerAssignment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="WorkerNotification" EntityType="Self.WorkerNotification" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Notification" Association="Self.FK_Notification">
+            <End Role="Notification" EntitySet="Notification" />
+            <End Role="WorkerNotification" EntitySet="WorkerNotification" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Worker" Association="Self.FK_Worker">
+            <End Role="Worker" EntitySet="Worker" />
+            <End Role="WorkerNotification" EntitySet="WorkerNotification" />
+          </AssociationSet>
           <AssociationSet Name="FK_WorkerAssignment_Worker" Association="Self.FK_WorkerAssignment_Worker">
             <End Role="Worker" EntitySet="Worker" />
             <End Role="WorkerAssignment" EntitySet="WorkerAssignment" />
@@ -60,6 +110,7 @@
           <Property Name="WorkspaceName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="WorkerAssignments" Relationship="TimesheetifyModel.FK_WorkerAssignment_Worker" FromRole="Worker" ToRole="WorkerAssignment" />
           <Property Name="Cleanup" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Notifications" Relationship="TimesheetifyModel.WorkerNotification" FromRole="Worker" ToRole="Notification" />
         </EntityType>
         <EntityContainer Name="TimesheetifyEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Workers" EntityType="Self.Worker" />
@@ -67,6 +118,11 @@
           <AssociationSet Name="FK_WorkerAssignment_Worker" Association="TimesheetifyModel.FK_WorkerAssignment_Worker">
             <End Role="Worker" EntitySet="Workers" />
             <End Role="WorkerAssignment" EntitySet="WorkerAssignments" />
+          </AssociationSet>
+          <EntitySet Name="Notifications" EntityType="TimesheetifyModel.Notification" />
+          <AssociationSet Name="WorkerNotification" Association="TimesheetifyModel.WorkerNotification">
+            <End Role="Notification" EntitySet="Notifications" />
+            <End Role="Worker" EntitySet="Workers" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="WorkerAssignment">
@@ -92,6 +148,19 @@
               <PropertyRef Name="WorkerId" />
             </Dependent>
           </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Notification">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Heading" Type="String" MaxLength="400" FixedLength="false" Unicode="true" />
+          <Property Name="ContentHTML" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Workers" Relationship="TimesheetifyModel.WorkerNotification" FromRole="Notification" ToRole="Worker" />
+        </EntityType>
+        <Association Name="WorkerNotification">
+          <End Type="TimesheetifyModel.Notification" Role="Notification" Multiplicity="*" />
+          <End Type="TimesheetifyModel.Worker" Role="Worker" Multiplicity="*" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -122,6 +191,23 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Notifications">
+            <EntityTypeMapping TypeName="TimesheetifyModel.Notification">
+              <MappingFragment StoreEntitySet="Notification">
+                <ScalarProperty Name="ContentHTML" ColumnName="ContentHTML" />
+                <ScalarProperty Name="Heading" ColumnName="Heading" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="WorkerNotification" TypeName="TimesheetifyModel.WorkerNotification" StoreEntitySet="WorkerNotification">
+            <EndProperty Name="Worker">
+              <ScalarProperty Name="Id" ColumnName="WorkerId" />
+            </EndProperty>
+            <EndProperty Name="Notification">
+              <ScalarProperty Name="Id" ColumnName="NotificationId" />
+            </EndProperty>
+          </AssociationSetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

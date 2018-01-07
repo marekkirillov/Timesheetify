@@ -126,6 +126,11 @@ else if (Model.ShowSuccess)
     Html.RenderAction("Index", "Settings");
 }
 
+@if (Model.Notification != null)
+{
+    Html.RenderPartial("_Notification", Model.Notification);
+}
+
 <script type="text/javascript">
     $(function () {
         $("button.submit").click(function () {

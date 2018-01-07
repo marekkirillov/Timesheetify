@@ -27,5 +27,6 @@ namespace TogglToTimesheet.Data
     
         public virtual DbSet<Worker> Workers { get; set; }
         public virtual DbSet<WorkerAssignment> WorkerAssignments { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
     }
 }

@@ -21,8 +21,10 @@ namespace Timesheetify.Models
 
 		public string Success { get; set; }
 
-		public IList<SelectListItem> Weeks { get; set; }
-		public DateTime? SelectedWeek { get; set; }
+        public IList<SelectListItem> Weeks { get; set; }
+        public DateTime? SelectedWeek { get; set; }
+	    public NotificationModel Notification { get; set; }
 		public bool Submit { get; set; }
+
 	}
 }

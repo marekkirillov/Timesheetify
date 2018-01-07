@@ -24,6 +24,8 @@
 		{
 			var timesheetPeriod = GetTimesheetPeriod(accountName, startDate);
 
+			if (timesheetPeriod == null) return false;
+
 			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(accountName))
 			{
 				try

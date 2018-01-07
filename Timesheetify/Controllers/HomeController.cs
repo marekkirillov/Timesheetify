@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
+using TogglToTimesheet.Active_Directory;
+using TogglToTimesheet.Repository;
 
 namespace Timesheetify.Controllers
 {
 	using System;
 	using System.Data.Entity.Migrations;
-	using System.IO;
 	using System.Linq;
 	using Models;
 	using TogglToTimesheet;
@@ -19,6 +20,10 @@ namespace Timesheetify.Controllers
 	{
 		public ActionResult Index()
 		{
+			EnsureUser();
+
+			var notification = new NotificationRepository().Get(CurrentWorker.Id);
+
 			var model = new Model
 			{
 				Name = User.Identity.Name.CleanName(),
@@ -27,6 +32,17 @@ namespace Timesheetify.Controllers
 				Success = SuccessMsg,
 				Error = ErrorMsg
 			};
+
+			if (notification != null)
+			{
+				model.Notification = new NotificationModel
+				{
+					Id = notification.Id,
+					Content = notification.ContentHTML,
+					Heading = notification.Heading.Replace("$User",
+						AdUserProvider.GetUserByIdentityName(User.Identity.Name.CleanName()).DisplayName)
+				};
+			}
 
 			try
 			{
@@ -135,10 +151,7 @@ namespace Timesheetify.Controllers
 		{
 			using (var context = new TimesheetifyEntities())
 			{
-				var worker = context.Workers.FirstOrDefault(f => f.Identity.Equals(CurrentUsername)) ?? new Worker
-				{
-					Identity = User.Identity.Name.CleanName()
-				};
+				var worker = context.Workers.FirstOrDefault(f => f.Identity.Equals(CurrentUsername));
 
 				new Toggl(model.ApiKey, null).ValidateApiKey(model.ApiKey);
 
@@ -173,10 +186,18 @@ namespace Timesheetify.Controllers
 			for (var i = 1; i <= maxWeeks; i++)
 			{
 				var monday = DateTime.Today.AddDays(-(int)today + (int)DayOfWeek.Monday - list.Count * 7);
+				if (monday.DayOfWeek != DayOfWeek.Monday) monday = monday.AddDays(-1);
 				list.Add(monday);
-			}
+			 }
 
 			return list.Where(l => Timesheet.IsTimesheetOpen(CurrentUsername, l));
+		}
+
+		[HttpPost]
+		public JsonResult DismissNotification(int id)
+		{
+			new NotificationRepository().Dissmiss(id, CurrentWorker.Id);
+			return null;
 		}
 	}
 }
