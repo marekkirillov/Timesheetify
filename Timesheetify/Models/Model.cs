@@ -23,5 +23,6 @@ namespace Timesheetify.Models
 
         public IList<SelectListItem> Weeks { get; set; }
         public DateTime? SelectedWeek { get; set; }
+	    public NotificationModel Notification { get; set; }
    }
 }

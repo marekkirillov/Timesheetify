@@ -1,11 +1,10 @@
-﻿using System.Web.Mvc;
+﻿using System.Data.Entity.Migrations;
+using System.Web.Mvc;
 
 namespace Timesheetify.Controllers
 {
 	using System;
 	using System.IO;
-	using System.ServiceModel;
-	using System.Web.Services.Protocols;
 	using Helpers;
 	using TogglToTimesheet.Data;
 	using TogglToTimesheet.Repository;
@@ -46,6 +45,28 @@ namespace Timesheetify.Controllers
 
 		#endregion
 
+		public void EnsureUser()
+		{
+			if (WorkerRepository.GetCurrentWorker(CurrentUsername) == null)
+			{
+				using (var context = new TimesheetifyEntities())
+				{
+					var worker = new Worker
+					{
+						Identity = User.Identity.Name.CleanName()
+					};
+
+					worker.Notifications.Add(context.Notifications.Find(1));
+					
+					context.Workers.AddOrUpdate(worker);
+					context.SaveChanges();
+
+					LogRequest(Action.NewUser, "OK");
+					HttpContext.Items["worker"] = worker;
+				}
+			}
+		}
+
 		public Worker CurrentWorker
 		{
 			get
@@ -69,7 +90,8 @@ namespace Timesheetify.Controllers
 			TogglToTimesheet = 1,
 			TimesheetToToggl = 2,
 			APIKeySave = 3,
-			SaveSettings = 4
+			SaveSettings = 4,
+			NewUser = 5
 		}
 
 		public void LogError(Exception e)
@@ -105,9 +127,26 @@ namespace Timesheetify.Controllers
 
 		public void LogRequest(Action action, string success)
 		{
-			var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name.CleanName()} - {(action == Action.TimesheetToToggl ? "Timesheet -> Toggl" : action == Action.TogglToTimesheet ? "Toggl -> Timesheet" : "Toggl API key saved")} - with message:{success}";
+			var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name.CleanName()} - {GetMessage(action)} - with message:{success}";
 
 			System.IO.File.AppendAllText(path, msg);
+		}
+
+		private static string GetMessage(Action action)
+		{
+			switch (action)
+			{
+				case Action.NewUser:
+					return "New user created";
+				case Action.APIKeySave:
+					return "Toggl API key saved";
+				case Action.TimesheetToToggl:
+					return "Synced data from Timesheet to Toggl";
+				case Action.TogglToTimesheet:
+					return "Synced data from Toggl to Timesheet";
+			}
+
+			return string.Empty;
 		}
 	}
 }

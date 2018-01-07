@@ -12,24 +12,19 @@ namespace TogglToTimesheet.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class Worker
+    public partial class Notification
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Worker()
+        public Notification()
         {
-            this.WorkerAssignments = new HashSet<WorkerAssignment>();
-            this.Notifications = new HashSet<Notification>();
+            this.Workers = new HashSet<Worker>();
         }
     
         public int Id { get; set; }
-        public string Identity { get; set; }
-        public string TogglApiKey { get; set; }
-        public string WorkspaceName { get; set; }
-        public bool Cleanup { get; set; }
+        public string Heading { get; set; }
+        public string ContentHTML { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<WorkerAssignment> WorkerAssignments { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<Worker> Workers { get; set; }
     }
 }

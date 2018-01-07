@@ -5,9 +5,11 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="d9626dab023146aab5d19b2d0fb54854" Name="Diagram1">
-        <EntityTypeShape EntityType="TimesheetifyModel.Worker" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="TimesheetifyModel.Worker" Width="1.5" PointX="1.125" PointY="0.625" IsExpanded="true" />
         <EntityTypeShape EntityType="TimesheetifyModel.WorkerAssignment" Width="1.5" PointX="3" PointY="4.875" />
         <AssociationConnector Association="TimesheetifyModel.FK_WorkerAssignment_Worker" />
+        <EntityTypeShape EntityType="TimesheetifyModel.Notification" Width="1.5" PointX="0.5" PointY="5.125" />
+        <AssociationConnector Association="TimesheetifyModel.WorkerNotification" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

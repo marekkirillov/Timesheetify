@@ -162,6 +162,9 @@
     <Compile Include="Active Directory\AdUserProvider.cs" />
     <Compile Include="Active Directory\User.cs" />
     <Compile Include="Common\Constants.cs" />
+    <Compile Include="Data\Notification.cs">
+      <DependentUpon>Worker.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\Worker.Context.cs">
       <DependentUpon>Worker.Context.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -192,6 +195,7 @@
     <Compile Include="DTO\TogglWorkspace.cs" />
     <Compile Include="EndpointProvider.cs" />
     <Compile Include="ImpersonationContext.cs" />
+    <Compile Include="Repository\NotificationRepository.cs" />
     <Compile Include="Repository\WorkerRepository.cs" />
     <Compile Include="Timesheetify.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

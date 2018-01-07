@@ -255,6 +255,7 @@
     <Compile Include="Helpers\IdentityHelper.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Models\Model.cs" />
+    <Compile Include="Models\NotificationModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -317,6 +318,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
+    <Content Include="Views\Home\_Notification.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

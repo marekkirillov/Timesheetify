@@ -38,7 +38,7 @@ h1#heading {
 .main-form .front:before {
     position: absolute;
     display: block;
-    content: 'V2.0';
+    content: 'V2.2';
     text-align: center;
     width: 130px;
     height: 30px;
@@ -306,4 +306,17 @@ body.modal-open, .modal-open .navbar-fixed-top, .modal-open .navbar-fixed-bottom
     100% {
         opacity: 0;
     }
+}
+
+.overlay {
+    display: block;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1;
 }
