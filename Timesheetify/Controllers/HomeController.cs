@@ -91,14 +91,19 @@ namespace Timesheetify.Controllers
 					SuccessMsg = $"Successfully added {result.NewTimesheetLines} entries to Timesheet";
 					LogRequest(Action.TogglToTimesheet, SuccessMsg);
 
-					if (model.SelectedApprover!=null && string.IsNullOrEmpty(result.Message) && CurrentWorker.AutoSubmit.GetValueOrDefault())
+					if (model.SelectedApprover != null && string.IsNullOrEmpty(result.Message) && CurrentWorker.AutoSubmit.GetValueOrDefault())
 						SuccessMsg = $"Timesheet with {result.NewTimesheetLines} entries submitted successfully";
 					else
 						ErrorMsg = result.Message;
 				}
 				catch (Exception e)
 				{
-					ErrorMsg = e.Message + Environment.NewLine + e.InnerException;
+					if (e.Message.Contains("GeneralItemDoesNotExist") ||
+						e.InnerException != null && e.InnerException.Message.Contains("GeneralItemDoesNotExist"))
+						ErrorMsg = "Timesheet throw an error (GeneralItemDoesNotExist). Please sync from Timesheet to Toggl with Cleanup Toggl option (from Advanced settings) and try again.";
+					else
+						ErrorMsg = e.Message + Environment.NewLine + e.InnerException;
+
 					LogError(e);
 				}
 			}
@@ -187,7 +192,7 @@ namespace Timesheetify.Controllers
 					Text = m.Name
 				}).ToList();
 
-				model.Approvers.Insert(0,new SelectListItem
+				model.Approvers.Insert(0, new SelectListItem
 				{
 					Value = null,
 					Text = "Do not submit"

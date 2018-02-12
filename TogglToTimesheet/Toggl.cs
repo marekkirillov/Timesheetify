@@ -1,4 +1,6 @@
-﻿namespace TogglToTimesheet
+﻿using Microsoft.Office.Project.Server.Library;
+
+namespace TogglToTimesheet
 {
 	using System;
 	using System.Collections.Generic;
@@ -153,11 +155,18 @@
 			var i = 0;
 			foreach (var tag in dataTags)
 			{
-				if (tagNames.Contains(tag))
+				if (tagNames.Contains(tag, new StringComparerWithComparisonType(StringComparison.InvariantCultureIgnoreCase)))
 					continue;
 
-				TogglPost<TogglTag, object>(TogglTagsUrl, new { tag = new TogglTag { name = tag, wid = wid } });
-				i++;
+				try
+				{
+					TogglPost<TogglTag, object>(TogglTagsUrl, new { tag = new TogglTag { name = tag, wid = wid } });
+					i++;
+				}
+				catch (Exception e)
+				{
+					throw new Exception($"Failed adding tag {tag} with id {wid}", e);
+				}
 			}
 
 
@@ -198,6 +207,8 @@
 			var content = GetContent(data);
 			var result = _httpClient.PostAsync(url, content).Result;
 			var response = result.Content.ReadAsStringAsync().Result;
+
+			if (!result.IsSuccessStatusCode) throw new Exception("Error response from Toggl", new Exception("Status code: "+ result.StatusCode + " " + result.ReasonPhrase));
 
 			return JsonConvert.DeserializeObject<T>(response);
 		}

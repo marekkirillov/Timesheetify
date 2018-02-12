@@ -35,12 +35,12 @@ namespace TogglToTimesheet.Repository
 				//save or update GUIDs by tag so that tags refer always to newest assignments
 
 				var workerAssignments = context.WorkerAssignments.Where(wa => wa.WorkerId == worker.Id);
-				var assignmentsGrouped = assignments.GroupBy(a => a.Tag);
+				var assignmentsGrouped = assignments.GroupBy(a => a.Tag, StringComparer.InvariantCultureIgnoreCase);
 				var assignmentsDistincted = assignmentsGrouped.Select(g => g.OrderByDescending(a => a.End).First());
 
 				foreach (var resourceAssignment in assignmentsDistincted)
 				{
-					var workerAssignment = workerAssignments.FirstOrDefault(wa => wa.Tag.Equals(resourceAssignment.Tag)) ??
+					var workerAssignment = workerAssignments.FirstOrDefault(wa => wa.Tag.Equals(resourceAssignment.Tag, StringComparison.InvariantCultureIgnoreCase)) ??
 										   new WorkerAssignment
 										   {
 											   Tag = resourceAssignment.Tag,
