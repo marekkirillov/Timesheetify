@@ -101,6 +101,9 @@ namespace Timesheetify.Controllers
 					if (e.Message.Contains("GeneralItemDoesNotExist") ||
 						e.InnerException != null && e.InnerException.Message.Contains("GeneralItemDoesNotExist"))
 						ErrorMsg = "Timesheet throw an error (GeneralItemDoesNotExist). Please sync from Timesheet to Toggl with Cleanup Toggl option (from Advanced settings) and try again.";
+					if (e.Message.Contains("GeneralInvalidOperation") ||
+					    e.InnerException != null && e.InnerException.Message.Contains("GeneralInvalidOperation"))
+						ErrorMsg = $"Timesheet throw an error (GeneralInvalidOperation). Please verify that all rows in Toggl for the week starting at {model.SelectedWeek.Value.ToShortDateString()} has matching PROJECTS and TAGS selected.";
 					else
 						ErrorMsg = e.Message + Environment.NewLine + e.InnerException;
 

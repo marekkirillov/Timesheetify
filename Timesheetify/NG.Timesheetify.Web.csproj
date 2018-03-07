@@ -252,6 +252,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\EmailSender.cs" />
     <Compile Include="Helpers\IdentityHelper.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Models\Model.cs" />

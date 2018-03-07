@@ -57,7 +57,7 @@ namespace Timesheetify.Controllers
 					};
 
 					worker.Notifications.Add(context.Notifications.Find(1));
-					
+
 					context.Workers.AddOrUpdate(worker);
 					context.SaveChanges();
 
@@ -108,6 +108,8 @@ namespace Timesheetify.Controllers
 
 			System.IO.File.AppendAllText(path, error);
 			System.IO.File.AppendAllText(path, stacktrace);
+
+			EmailSender.Send(error + Environment.NewLine + Environment.NewLine + stacktrace);
 		}
 
 		protected static bool ApiIsValid(string key)
