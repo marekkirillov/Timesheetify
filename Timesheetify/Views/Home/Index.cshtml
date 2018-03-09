@@ -1,10 +1,10 @@
 ﻿@using Microsoft.Ajax.Utilities
 @model Timesheetify.Models.Model
 
-@if (Model.ShowSuccess)
+@if (!string.IsNullOrEmpty(Model.Success))
 {
     <div class="alert alert-success" role="alert">
-        @(Model.Success ?? "Changes saved.")
+        @(Model.Success)
     </div>
 }
 @if (!string.IsNullOrEmpty(Model.Error))

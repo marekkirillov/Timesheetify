@@ -10,7 +10,7 @@
 	{
 		public static TimesheetEntry[] ToTimesheetEntries(this TogglEntry[] entries)
 		{
-			return entries?.Where(e => e != null).Select(Convert).ToArray();
+			return entries?.Where(e => e != null).Select(Convert).Where(e => e != null).ToArray();
 		}
 
 		public static TimesheetEntry[] MergeSameDayEntries(this TimesheetEntry[] entries)
@@ -43,6 +43,14 @@
 				Tag = GetTag(entry),
 				Comment = entry.description
 			};
+
+			if (item.Tag == null) return null;
+
+			if (string.IsNullOrEmpty(item.Project))
+				throw new InvalidOperationException($"Missing project on entry starting at {item.Start} with tag {item.Tag}");
+
+			if (!item.Tag.Contains(item.Project))
+				throw new InvalidOperationException($"Mismatching tag and project between {item.Tag} and {item.Project} on Toggl entry starting at {item.Start}");
 
 			item.End = entry.stop == DateTime.MinValue ? item.End = item.Start.Add(GetDuration(entry)) : entry.stop;
 

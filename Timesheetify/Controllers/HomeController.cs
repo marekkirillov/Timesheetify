@@ -29,7 +29,6 @@ namespace Timesheetify.Controllers
 			{
 				Name = User.Identity.Name.CleanName(),
 				ApiKey = CurrentWorker?.TogglApiKey,
-				ShowSuccess = Redirected,
 				Success = SuccessMsg,
 				Error = ErrorMsg,
 				AutosubmitEnabled = CurrentWorker?.AutoSubmit ?? false
@@ -67,6 +66,7 @@ namespace Timesheetify.Controllers
 				try
 				{
 					SaveKey(model);
+					SuccessMsg = "Changes saved";
 				}
 				catch (Exception e)
 				{
