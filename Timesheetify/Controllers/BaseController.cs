@@ -94,7 +94,7 @@ namespace Timesheetify.Controllers
 			NewUser = 5
 		}
 
-		public void LogError(Exception e)
+		public void LogError(Exception e, string msg = null)
 		{
 			var path = GetPath();
 			var error = $"{Environment.NewLine}ERROR - {DateTime.Now} - {User.Identity.Name.CleanName()} - {e.Message}";
@@ -109,7 +109,7 @@ namespace Timesheetify.Controllers
 			System.IO.File.AppendAllText(path, error);
 			System.IO.File.AppendAllText(path, stacktrace);
 
-			EmailSender.Send(error + Environment.NewLine + Environment.NewLine + stacktrace);
+			EmailSender.Send("Message: " + msg + Environment.NewLine + Environment.NewLine + error + Environment.NewLine + Environment.NewLine + stacktrace);
 		}
 
 		protected static bool ApiIsValid(string key)
