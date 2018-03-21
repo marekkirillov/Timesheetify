@@ -107,7 +107,7 @@ namespace Timesheetify.Controllers
 					else
 						ErrorMsg = e.Message + Environment.NewLine + e.InnerException;
 
-					LogError(e);
+					LogError(e, ErrorMsg);
 				}
 			}
 			else
