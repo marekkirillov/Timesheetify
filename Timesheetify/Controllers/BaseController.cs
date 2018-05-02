@@ -1,154 +1,161 @@
-﻿using System.Data.Entity.Migrations;
+﻿using System.Collections;
+using System.Data.Entity.Migrations;
 using System.Web.Mvc;
 
 namespace Timesheetify.Controllers
 {
-	using System;
-	using System.IO;
-	using Helpers;
-	using TogglToTimesheet.Data;
-	using TogglToTimesheet.Repository;
+    using System;
+    using System.IO;
+    using Helpers;
+    using TogglToTimesheet.Data;
+    using TogglToTimesheet.Repository;
 
-	public class BaseController : Controller
-	{
-		#region Tempdata
+    public class BaseController : Controller
+    {
+        #region Tempdata
 
-		public bool Redirected
-		{
-			get
-			{
-				var obj = TempData["redirected"];
-				return obj != null && bool.Parse(obj.ToString());
-			}
-			set { TempData["redirected"] = value; }
-		}
+        public bool Redirected
+        {
+            get
+            {
+                var obj = TempData["redirected"];
+                return obj != null && bool.Parse(obj.ToString());
+            }
+            set { TempData["redirected"] = value; }
+        }
 
-		public string ErrorMsg
-		{
-			get
-			{
-				var obj = TempData["error"];
-				return obj?.ToString();
-			}
-			set { TempData["error"] = value; }
-		}
+        public string ErrorMsg
+        {
+            get
+            {
+                var obj = TempData["error"];
+                return obj?.ToString();
+            }
+            set { TempData["error"] = value; }
+        }
 
-		public string SuccessMsg
-		{
-			get
-			{
-				var obj = TempData["success"];
-				return obj?.ToString();
-			}
-			set { TempData["success"] = value; }
-		}
+        public string SuccessMsg
+        {
+            get
+            {
+                var obj = TempData["success"];
+                return obj?.ToString();
+            }
+            set { TempData["success"] = value; }
+        }
 
-		#endregion
+        #endregion
 
-		public void EnsureUser()
-		{
-			if (WorkerRepository.GetCurrentWorker(CurrentUsername) == null)
-			{
-				using (var context = new TimesheetifyEntities())
-				{
-					var worker = new Worker
-					{
-						Identity = User.Identity.Name.CleanName()
-					};
+        public void EnsureUser()
+        {
+            if (WorkerRepository.GetCurrentWorker(CurrentUsername) == null)
+            {
+                using (var context = new TimesheetifyEntities())
+                {
+                    var worker = new Worker
+                    {
+                        Identity = User.Identity.Name.CleanName()
+                    };
 
-					worker.Notifications.Add(context.Notifications.Find(1));
+                    worker.Notifications.Add(context.Notifications.Find(1));
 
-					context.Workers.AddOrUpdate(worker);
-					context.SaveChanges();
+                    context.Workers.AddOrUpdate(worker);
+                    context.SaveChanges();
 
-					LogRequest(Action.NewUser, "OK");
-					HttpContext.Items["worker"] = worker;
-				}
-			}
-		}
+                    LogRequest(Action.NewUser, "OK");
+                    HttpContext.Items["worker"] = worker;
+                }
+            }
+        }
 
-		public Worker CurrentWorker
-		{
-			get
-			{
-				var worker = (Worker)HttpContext.Items["worker"];
+        public Worker CurrentWorker
+        {
+            get
+            {
+                var worker = (Worker)HttpContext.Items["worker"];
 
-				if (worker == null)
-				{
-					worker = WorkerRepository.GetCurrentWorker(CurrentUsername);
-					HttpContext.Items["worker"] = worker;
-				}
+                if (worker == null)
+                {
+                    worker = WorkerRepository.GetCurrentWorker(CurrentUsername);
+                    HttpContext.Items["worker"] = worker;
+                }
 
-				return worker;
-			}
-		}
+                return worker;
+            }
+        }
 
-		public string CurrentUsername => User.Identity.Name.CleanName();
+        public string CurrentUsername => User.Identity.Name.CleanName();
 
-		public enum Action
-		{
-			TogglToTimesheet = 1,
-			TimesheetToToggl = 2,
-			APIKeySave = 3,
-			SaveSettings = 4,
-			NewUser = 5
-		}
+        public enum Action
+        {
+            TogglToTimesheet = 1,
+            TimesheetToToggl = 2,
+            APIKeySave = 3,
+            SaveSettings = 4,
+            NewUser = 5
+        }
 
-		public void LogError(Exception e, string msg = null)
-		{
-			var path = GetPath();
-			var error = $"{Environment.NewLine}ERROR - {DateTime.Now} - {User.Identity.Name.CleanName()} - {e.Message}";
-			var stacktrace = $"{Environment.NewLine}{e.StackTrace}";
+        public void LogError(Exception e, string msg = null)
+        {
+            var path = GetPath();
+            var error = $"{Environment.NewLine}ERROR - {DateTime.Now} - {User.Identity.Name.CleanName()} - {e.Message}{Environment.NewLine}";
+            var additionalData = "Additional data: ";
 
-			if (e.InnerException != null)
-			{
-				error += $"- ({e.InnerException.Message})";
-				stacktrace += $"{Environment.NewLine}{e.InnerException.StackTrace}";
-			}
+            foreach (DictionaryEntry de in e.Data)
+                additionalData += $"{de.Key}:{de.Value}{Environment.NewLine}";
 
-			System.IO.File.AppendAllText(path, error);
-			System.IO.File.AppendAllText(path, stacktrace);
+            var stacktrace = $"{Environment.NewLine}{e.StackTrace}";
 
-			EmailSender.Send("Message: " + msg + Environment.NewLine + Environment.NewLine + error + Environment.NewLine + Environment.NewLine + stacktrace);
-		}
+            if (e.InnerException != null)
+            {
+                error += $"- ({e.InnerException.Message})";
+                stacktrace += $"{Environment.NewLine}{e.InnerException.StackTrace}";
+            }
 
-		protected static bool ApiIsValid(string key)
-		{
-			return key != null && key.Length == 32;
-		}
+            System.IO.File.AppendAllText(path, error);
+            System.IO.File.AppendAllText(path, additionalData);
+            System.IO.File.AppendAllText(path, stacktrace);
 
-		private static string GetPath()
-		{
-			const string path = "C:\\Logs\\Timesheetify";
+            EmailSender.Send("Message: " + msg + Environment.NewLine + Environment.NewLine + error + Environment.NewLine + additionalData + Environment.NewLine + Environment.NewLine + stacktrace);
+        }
 
-			if (!Directory.Exists(path))
-				Directory.CreateDirectory(path);
+        protected static bool ApiIsValid(string key)
+        {
+            return key != null && key.Length == 32;
+        }
 
-			return Path.Combine(path, "Log.txt");
-		}
+        private static string GetPath()
+        {
+            const string path = "C:\\Logs\\Timesheetify";
 
-		public void LogRequest(Action action, string success)
-		{
-			var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name.CleanName()} - {GetMessage(action)} - with message:{success}";
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
 
-			System.IO.File.AppendAllText(path, msg);
-		}
+            return Path.Combine(path, "Log.txt");
+        }
 
-		private static string GetMessage(Action action)
-		{
-			switch (action)
-			{
-				case Action.NewUser:
-					return "New user created";
-				case Action.APIKeySave:
-					return "Toggl API key saved";
-				case Action.TimesheetToToggl:
-					return "Synced data from Timesheet to Toggl";
-				case Action.TogglToTimesheet:
-					return "Synced data from Toggl to Timesheet";
-			}
+        public void LogRequest(Action action, string success)
+        {
+            var path = GetPath(); var msg = $"{Environment.NewLine}ACTION - {DateTime.Now} - {User.Identity.Name.CleanName()} - {GetMessage(action)} - with message:{success}";
 
-			return string.Empty;
-		}
-	}
+            System.IO.File.AppendAllText(path, msg);
+        }
+
+        private static string GetMessage(Action action)
+        {
+            switch (action)
+            {
+                case Action.NewUser:
+                    return "New user created";
+                case Action.APIKeySave:
+                    return "Toggl API key saved";
+                case Action.TimesheetToToggl:
+                    return "Synced data from Timesheet to Toggl";
+                case Action.TogglToTimesheet:
+                    return "Synced data from Toggl to Timesheet";
+            }
+
+            return string.Empty;
+        }
+    }
 }

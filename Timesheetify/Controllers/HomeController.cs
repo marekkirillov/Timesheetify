@@ -34,19 +34,19 @@ namespace Timesheetify.Controllers
 				AutosubmitEnabled = CurrentWorker?.AutoSubmit ?? false
 			};
 
-			if (notification != null)
-			{
-				model.Notification = new NotificationModel
-				{
-					Id = notification.Id,
-					Content = notification.ContentHTML,
-					Heading = notification.Heading.Replace("$User",
-						AdUserProvider.GetUserByIdentityName(User.Identity.Name.CleanName()).DisplayName)
-				};
-			}
-
 			try
 			{
+				if (notification != null)
+				{
+					model.Notification = new NotificationModel
+					{
+						Id = notification.Id,
+						Content = notification.ContentHTML,
+						Heading = notification.Heading.Replace("$User",
+							AdUserProvider.GetUserByIdentityName(User.Identity.Name.CleanName()).DisplayName)
+					};
+				}
+
 				FillLists(model);
 			}
 			catch (Exception e)
@@ -102,7 +102,7 @@ namespace Timesheetify.Controllers
 						e.InnerException != null && e.InnerException.Message.Contains("GeneralItemDoesNotExist"))
 						ErrorMsg = "Timesheet throw an error (GeneralItemDoesNotExist). Please sync from Timesheet to Toggl with Cleanup Toggl option (from Advanced settings) and try again.";
 					else if (e.Message.Contains("GeneralInvalidOperation") ||
-					    e.InnerException != null && e.InnerException.Message.Contains("GeneralInvalidOperation"))
+						e.InnerException != null && e.InnerException.Message.Contains("GeneralInvalidOperation"))
 						ErrorMsg = $"Timesheet throw an error (GeneralInvalidOperation). Please verify that all rows in Toggl for the week starting at {model.SelectedWeek.Value.ToShortDateString()} has matching PROJECTS and TAGS selected.";
 					else
 						ErrorMsg = e.Message + Environment.NewLine + e.InnerException;
