@@ -61,7 +61,7 @@
 		internal static string FillWeek(string accountName, TimesheetEntry[] timesheetEntries, DateTime? startDate = null, Guid? approver = null)
 		{
 			LoadLineClasses(accountName);
-
+		    var tag = string.Empty;
 			var timesheetPeriod = GetTimesheetPeriod(accountName, startDate);
 
 			using (var context = new ImpersonationContext<TimeSheetClient, TimeSheet>(accountName))
@@ -82,7 +82,9 @@
 						if (workerAssignment == null)
 							continue;
 
-						var line = timesheetRows.FirstOrDefault(l => l.TASK_UID.Equals(workerAssignment.TaskGuid));
+					    tag = workerAssignment.Tag;
+
+                        var line = timesheetRows.FirstOrDefault(l => l.TASK_UID.Equals(workerAssignment.TaskGuid));
 						var first = timesheetEntryGroup.First();
 
 						if (line == null)
@@ -154,8 +156,14 @@
 						var xml = ((FaultException)e).CreateMessageFault().GetDetail<SvcTimeSheet.ServerExecutionFault>()
 							.ExceptionDetails.InnerXml;
 
-						throw new Exception(xml);
+					    var exception = new Exception(xml);
+
+					    exception.Data.Add("Tag", tag);
+
+                        throw exception;
 					}
+
+                    e.Data.Add("Tag", tag);
 					throw;
 				}
 			}

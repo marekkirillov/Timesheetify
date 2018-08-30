@@ -128,7 +128,7 @@ namespace Timesheetify.Controllers
 			}
 			catch (Exception e)
 			{
-				ErrorMsg = e.Message + Environment.NewLine + e.InnerException;
+				ErrorMsg = e.Message + Environment.NewLine + e.InnerException?.Message;
 				LogError(e);
 			}
 

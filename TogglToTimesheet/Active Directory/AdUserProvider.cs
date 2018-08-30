@@ -1,4 +1,6 @@
-﻿namespace TogglToTimesheet.Active_Directory
+﻿using System;
+
+namespace TogglToTimesheet.Active_Directory
 {
     using System.DirectoryServices;
     using System.Linq;
@@ -23,12 +25,16 @@
 
         private static User CreateUser(SearchResult adSearchResult)
         {
-            return new User
-            {
-                DisplayName = adSearchResult.Properties["displayname"][0].ToString(),
-                AccountName = adSearchResult.Properties["samaccountname"][0].ToString(),
-                Department = adSearchResult.Properties["department"][0].ToString(),
+	        var displayName = adSearchResult.Properties["displayname"];
+			if(displayName.Count ==0 ) throw new Exception("Could not find 'displayname' value from AD");
 
+	        var samAccountName = adSearchResult.Properties["samaccountname"];
+			if(samAccountName.Count == 0) throw new Exception("Could not find 'samaccountname' value from AD");
+
+	        return new User
+            {
+                DisplayName = displayName[0].ToString(),
+                AccountName = samAccountName[0].ToString()
             };
         }
 

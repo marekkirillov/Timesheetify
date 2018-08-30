@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Project.Server.Library;
+﻿using System.Diagnostics;
+using Microsoft.Office.Project.Server.Library;
 
 namespace TogglToTimesheet
 {
@@ -32,7 +33,7 @@ namespace TogglToTimesheet
 		{
 			_workspaceId = workspaceId;
 			var togglApiPwd = apiKey + ":api_token";
-			var togglPwdB64 = Convert.ToBase64String(Encoding.Default.GetBytes(togglApiPwd.Trim()));
+			var togglPwdB64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(togglApiPwd.Trim()));
 			var toggleAuthHeader = "Basic " + togglPwdB64;
 
 			_httpClient = new HttpClient
@@ -105,7 +106,7 @@ namespace TogglToTimesheet
 					TogglPut($"{TogglProjectUrl}/{project.id}", project);
 				}
 				else
-					TogglPost<TogglProject, object>(TogglProjectUrl, new { project = new TogglProject { active = true, name = name, wid = wid } });
+					TogglPost<TogglProject, object>(TogglProjectUrl, new { project = new TogglProject { active = true, is_private = true, name = name, wid = wid } });
 
 				i++;
 			}
@@ -208,7 +209,7 @@ namespace TogglToTimesheet
 			var result = _httpClient.PostAsync(url, content).Result;
 			var response = result.Content.ReadAsStringAsync().Result;
 
-			if (!result.IsSuccessStatusCode) throw new Exception("Error response from Toggl", new Exception("Status code: "+ result.StatusCode + " " + result.ReasonPhrase));
+			if (!result.IsSuccessStatusCode) throw new Exception("Error response from Toggl:" + Environment.NewLine, new Exception("Status code: "+ result.StatusCode + " Message: " + result.Content.ReadAsStringAsync().Result));
 
 			return JsonConvert.DeserializeObject<T>(response);
 		}
@@ -225,9 +226,28 @@ namespace TogglToTimesheet
 
 		private T TogglGet<T>(string url, params object[] @params)
 		{
-			var result = _httpClient.GetStringAsync(string.Format(url, @params)).Result;
-			return JsonConvert.DeserializeObject<T>(result);
-		}
+		    try
+		    {
+		        var result = _httpClient.GetStringAsync(string.Format(url, @params)).Result;
+		        return JsonConvert.DeserializeObject<T>(result);
+		    }
+		    catch (HttpRequestException e)
+		    {
+                Debug.WriteLine(e);
+		        throw;
+		    }
+            catch (WebException e)
+		    {
+		        Debug.WriteLine(e);
+                throw;
+            }
+            catch (Exception ex)
+		    {
+                Debug.WriteLine(ex.GetType());
+                Debug.WriteLine(ex.InnerException.GetType());
+                throw;
+		    }
+        }
 
 		private void TogglDelete(string url)
 		{
